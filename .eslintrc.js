@@ -14,5 +14,7 @@ module.exports = {
   rules: {
     'arrow-body-style': 'off',
     'no-use-before-define': 'off',
+    'global-require': 'off',
+    'import/no-extraneous-dependencies': 'off',
   },
 };
