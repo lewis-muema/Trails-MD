@@ -8,6 +8,7 @@ import SignupScreen from './src/screens/SignupScreen';
 import TrackCreateScreen from './src/screens/TrackCreateScreen';
 import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
+import { Provider as AuthProvider } from './src/context/AuthContext';
 
 const Stack = createNativeStackNavigator();
 const Bottom = createBottomTabNavigator();
@@ -35,7 +36,7 @@ function Auth() {
   return (
     <Stack.Navigator initialRouteName="Signin">
       <Stack.Screen name="Signin" component={SigninScreen} options={{ title: 'Sign in' }} />
-      <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign up' }} />
+      <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign up', headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -54,5 +55,7 @@ function App() {
 }
 
 export default () => {
-  return <App />;
+  return <AuthProvider>
+        <App />
+      </AuthProvider>;
 };

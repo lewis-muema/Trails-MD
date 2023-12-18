@@ -16,5 +16,7 @@ module.exports = {
     'no-use-before-define': 'off',
     'global-require': 'off',
     'import/no-extraneous-dependencies': 'off',
+    'no-restricted-syntax': 'off',
+    'guard-for-in': 'off',
   },
 };

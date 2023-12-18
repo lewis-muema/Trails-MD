@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 
 const TrackListScreen = () => {
   const navigation = useNavigation();
-
   return <View>
       <Text style={styles.title}>Hi</Text>
       <Button title='Track details' onPress={() => navigation.navigate('TrackDetail')} />
