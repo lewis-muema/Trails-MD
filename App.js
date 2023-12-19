@@ -9,13 +9,16 @@ import TrackCreateScreen from './src/screens/TrackCreateScreen';
 import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
 import { Provider as AuthProvider } from './src/context/AuthContext';
+import { navigationRef } from './src/RootNavigation';
 
 const Stack = createNativeStackNavigator();
 const Bottom = createBottomTabNavigator();
 
 function Tracks() {
   return (
-    <Stack.Navigator initialRouteName="Signin">
+    <Stack.Navigator initialRouteName="Signin" screenOptions={{
+      headerShown: false,
+    }}>
       <Stack.Screen name="TrackList" component={TrackListScreen} options={{ title: 'Tracks' }} />
       <Stack.Screen name="TrackDetail" component={TrackDetailScreen} options={{ title: 'Track detail' }} />
     </Stack.Navigator>
@@ -24,8 +27,10 @@ function Tracks() {
 
 function Home() {
   return (
-    <Bottom.Navigator initialRouteName="Index">
-      <Bottom.Screen name="Tracks" component={Tracks} options={{ title: 'Tracks', headerShown: false }} />
+    <Bottom.Navigator initialRouteName="Index" screenOptions={{
+      headerShown: false,
+    }}>
+      <Bottom.Screen name="Tracks" component={Tracks} options={{ title: 'Tracks' }} />
       <Bottom.Screen name="TrackCreate" component={TrackCreateScreen} options={{ title: 'Create track' }} />
       <Bottom.Screen name="Account" component={AccountScreen} options={{ title: 'Account' }} />
     </Bottom.Navigator>
@@ -34,16 +39,18 @@ function Home() {
 
 function Auth() {
   return (
-    <Stack.Navigator initialRouteName="Signin">
+    <Stack.Navigator initialRouteName="Signin" screenOptions={{
+      headerShown: false,
+    }}>
       <Stack.Screen name="Signin" component={SigninScreen} options={{ title: 'Sign in' }} />
-      <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign up', headerShown: false }} />
+      <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign up' }} />
     </Stack.Navigator>
   );
 }
 
 function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName="Auth" screenOptions={{
         headerShown: false,
       }}>

@@ -1,9 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import {
+  View, StyleSheet, Text, SafeAreaView,
+} from 'react-native';
 
 
 const TrackDetailScreen = () => {
-  return <View><Text style={styles.title}>TrackDetail Screen</Text></View>;
+  return <SafeAreaView>
+    <View><Text style={styles.title}>TrackDetail Screen</Text></View>
+  </SafeAreaView>;
 };
 
 const styles = StyleSheet.create({

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View, StyleSheet, TouchableOpacity, Image,
 } from 'react-native';
@@ -25,7 +25,9 @@ const SignupScreen = () => {
   const [emailErr, setEmailErr] = useState('');
   const [passErr, setPassErr] = useState('');
   const [loading, setLoading] = useState(false);
-  const { state, signup } = useContext(AuthContext);
+  const {
+    state, signup, clearErrors, validateAuth,
+  } = useContext(AuthContext);
 
   const emailValidator = () => {
     if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
@@ -53,9 +55,19 @@ const SignupScreen = () => {
       passwordValidator();
     } else {
       setLoading(true);
-      signup({ email, password }, val => setLoading(val), () => navigation.navigate('Home', { screen: 'Tracks' }));
+      signup({ email, password }, val => setLoading(val));
     }
   };
+
+  useEffect(() => {
+    validateAuth();
+    navigation.addListener('focus', () => {
+      clearErrors();
+      setEmail('');
+      setPassword('');
+      setConfirm('');
+    });
+  }, []);
 
   return <View style={styles.container}>
     <Spacer />
@@ -154,7 +166,7 @@ const SignupScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#a9d58780',
+    backgroundColor: '#d2e3c0',
     justifyContent: 'center',
   },
   title: {
