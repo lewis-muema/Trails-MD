@@ -9,6 +9,7 @@ import TrackCreateScreen from './src/screens/TrackCreateScreen';
 import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
 import { Provider as AuthProvider } from './src/context/AuthContext';
+import { Provider as LocationProvider } from './src/context/locationContext';
 import { navigationRef } from './src/RootNavigation';
 
 const Stack = createNativeStackNavigator();
@@ -62,7 +63,9 @@ function App() {
 }
 
 export default () => {
-  return <AuthProvider>
-        <App />
-      </AuthProvider>;
+  return <LocationProvider>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </LocationProvider>;
 };

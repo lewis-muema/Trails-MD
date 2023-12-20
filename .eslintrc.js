@@ -18,5 +18,8 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'no-restricted-syntax': 'off',
     'guard-for-in': 'off',
+    'no-underscore-dangle': 'off',
+    'no-plusplus': 'off',
+    'no-unused-expressions': 'off',
   },
 };
