@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import {
-  View, StyleSheet, SafeAreaView,
+  View, StyleSheet,
 } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import { useIsFocused } from '@react-navigation/native';
@@ -17,33 +17,60 @@ const baseColor = '#316429';
 
 const TrackCreateScreen = () => {
   const isFocused = useIsFocused();
-  const [name, setName] = useState('');
-  const { addLocation } = useContext(locationContext);
-  const [err] = useLocation(isFocused, location => addLocation(location));
+  const {
+    state: {
+      name, recording,
+    },
+    addLocation,
+    startRecording,
+    stopRecording,
+    changeName,
+  } = useContext(locationContext);
+  const [error, setError] = useState('');
+  // useCallback maintains the state of the function sent
+  // to the watcher to prevent it from sending a new callback every time react rerenders.
+  const callback = useCallback(location => addLocation(location, recording), [recording]);
+  const [err] = useLocation(isFocused || recording, callback);
+
+  const record = () => {
+    if (name) {
+      recording ? stopRecording() : startRecording();
+    } else {
+      nameRef.current.shake();
+      setError('Please enter a name to start tracking');
+    }
+  };
+
   return <View style={styles.outerContainer}>
     <View style={styles.mapContainer}>
       <Map />
     </View>
-    <SafeAreaView style={styles.container}>
     <View style={styles.controls}>
       <View style={styles.inputCard}>
         <Input
           ref={nameRef}
-          label='Track name'
+          label='Track title'
+          placeholder='Enter name'
           value={name}
-          onChangeText={val => setName(val)}
+          onChangeText={(val) => {
+            changeName(val);
+            setError('');
+          }
+          }
           labelStyle={styles.label}
           inputStyle={styles.inputTextSytle}
           autoCorrect={false}
+          errorMessage={error}
           leftIcon={
             <Feather name="map-pin" size={18} color={baseColor} />
           }
         />
         <View style={styles.createTrackContainer}>
           <Button
-            title='Create Track'
-            buttonStyle={styles.createTrackButton}
+            title={recording ? 'Stop Tracking' : 'Start Tracking'}
+            buttonStyle={recording ? styles.saveTrackButton : styles.createTrackButton}
             titleStyle={styles.createTrackButtonText}
+            onPress={record}
           />
         </View>
       </View>
@@ -52,7 +79,6 @@ const TrackCreateScreen = () => {
         </Spacer> : null
       }
     </View>
-  </SafeAreaView>
   </View>;
 };
 
@@ -74,12 +100,6 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 10,
     borderRadius: 10,
-  },
-  container: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: '100%',
   },
   outerContainer: {
     height: '100%',
@@ -111,6 +131,12 @@ const styles = StyleSheet.create({
   },
   createTrackButton: {
     backgroundColor: baseColor,
+    borderRadius: 10,
+    width: '100%',
+    fontSize: 14,
+  },
+  saveTrackButton: {
+    backgroundColor: '#c91f1f',
     borderRadius: 10,
     width: '100%',
     fontSize: 14,
