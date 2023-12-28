@@ -10,6 +10,7 @@ import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
 import { Provider as AuthProvider } from './src/context/AuthContext';
 import { Provider as LocationProvider } from './src/context/locationContext';
+import { Provider as TrackProvider } from './src/context/trackContext';
 import { navigationRef } from './src/RootNavigation';
 
 const Stack = createNativeStackNavigator();
@@ -52,7 +53,7 @@ function Auth() {
 function App() {
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator initialRouteName="Auth" screenOptions={{
+      <Stack.Navigator initialRouteName="Home" screenOptions={{
         headerShown: false,
       }}>
         <Stack.Screen name="Auth" component={Auth} />
@@ -63,9 +64,11 @@ function App() {
 }
 
 export default () => {
-  return <LocationProvider>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </LocationProvider>;
+  return <TrackProvider>
+    <LocationProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </LocationProvider>
+  </TrackProvider>;
 };

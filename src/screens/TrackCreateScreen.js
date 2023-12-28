@@ -6,10 +6,10 @@ import { Input, Button } from 'react-native-elements';
 import { useIsFocused } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import Map from '../components/map';
-import Spacer from '../components/Spacer';
 import Banner from '../components/banner';
 import { Context as locationContext } from '../context/locationContext';
 import useLocation from '../hooks/useLocation';
+import useSaveTrack from '../hooks/useSaveTrack';
 // import '../_mockLocation';
 
 const nameRef = React.createRef();
@@ -19,18 +19,20 @@ const TrackCreateScreen = () => {
   const isFocused = useIsFocused();
   const {
     state: {
-      name, recording,
+      name, recording, locations,
     },
     addLocation,
     startRecording,
     stopRecording,
     changeName,
   } = useContext(locationContext);
+  const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   // useCallback maintains the state of the function sent
   // to the watcher to prevent it from sending a new callback every time react rerenders.
   const callback = useCallback(location => addLocation(location, recording), [recording]);
-  const [err] = useLocation(isFocused || recording, callback);
+  useLocation(isFocused || recording, callback);
 
   const record = () => {
     if (name) {
@@ -49,7 +51,7 @@ const TrackCreateScreen = () => {
       <View style={styles.inputCard}>
         <Input
           ref={nameRef}
-          label='Track title'
+          label='Trail title'
           placeholder='Enter name'
           value={name}
           onChangeText={(val) => {
@@ -69,14 +71,30 @@ const TrackCreateScreen = () => {
           <Button
             title={recording ? 'Stop Tracking' : 'Start Tracking'}
             buttonStyle={recording ? styles.saveTrackButton : styles.createTrackButton}
+            disabledStyle={styles.createTrackButton}
             titleStyle={styles.createTrackButtonText}
             onPress={record}
+            disabled={loading}
           />
+          {!recording && locations.length
+            ? <Button
+              title='Save Trail'
+              buttonStyle={styles.saveButton}
+              disabledStyle={styles.saveButton}
+              titleStyle={styles.createTrackButtonText}
+              onPress={() => saveTrack(val => setLoading(val))}
+              loading={loading}
+              disabled={loading}
+            /> : null}
         </View>
       </View>
-      { err ? <Spacer>
-        <Banner message='Please enable location services' type='error'></Banner>
-        </Spacer> : null
+      { trackError ? <View style={styles.error}>
+        <Banner message={trackError} type='error'></Banner>
+        </View> : null
+      }
+      { trackSuccess ? <View style={styles.error}>
+        <Banner message={trackSuccess} type='success'></Banner>
+        </View> : null
       }
     </View>
   </View>;
@@ -122,7 +140,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   createTrackContainer: {
-    width: '60%',
+    width: '90%',
     alignSelf: 'center',
   },
   createTrackButtonText: {
@@ -140,6 +158,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     fontSize: 14,
+  },
+  saveButton: {
+    backgroundColor: '#c91f1f',
+    borderRadius: 10,
+    width: '100%',
+    fontSize: 14,
+    marginTop: 15,
+  },
+  error: {
+    marginHorizontal: 30,
+    position: 'absolute',
+    top: -50,
+    width: '85%',
+    alignSelf: 'center',
   },
 });
 

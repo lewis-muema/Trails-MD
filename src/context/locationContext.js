@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 import createDataContext from './createDataContext';
 
 const locationReducer = (state, action) => {

@@ -1,6 +1,8 @@
 /* eslint-disable no-plusplus */
 import React, { useContext, useEffect } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  ActivityIndicator, StyleSheet, View, Text,
+} from 'react-native';
 import MapView, {
   Polyline, Marker, showCallout, hideCallout,
 } from 'react-native-maps';
@@ -14,7 +16,12 @@ const Map = () => {
     setPolyLines();
   }, [currentLocation]);
   if (!currentLocation) {
-    return <ActivityIndicator size='large' />;
+    return <View>
+      <Text style={styles.loadingText}>
+        Please make sure your location is turned on in your device settings
+      </Text>
+      <ActivityIndicator size='large' />
+    </View>;
   }
   return <MapView
     style={styles.map}
@@ -63,6 +70,15 @@ const Map = () => {
 const styles = StyleSheet.create({
   map: {
     height: '100%',
+  },
+  loadingText: {
+    width: 200,
+    textAlign: 'center',
+    alignSelf: 'center',
+    marginBottom: 15,
+    color: 'grey',
+    fontSize: 17,
+    fontWeight: '500',
   },
 });
 
