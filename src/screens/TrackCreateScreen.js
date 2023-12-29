@@ -10,6 +10,7 @@ import Banner from '../components/banner';
 import { Context as locationContext } from '../context/locationContext';
 import useLocation from '../hooks/useLocation';
 import useSaveTrack from '../hooks/useSaveTrack';
+import Metrics from '../components/metrics';
 // import '../_mockLocation';
 
 const nameRef = React.createRef();
@@ -47,6 +48,7 @@ const TrackCreateScreen = () => {
     <View style={styles.mapContainer}>
       <Map />
     </View>
+    <Metrics />
     <View style={styles.controls}>
       <View style={styles.inputCard}>
         <Input
@@ -114,10 +116,16 @@ const styles = StyleSheet.create({
   },
   inputCard: {
     backgroundColor: '#d2e3c0',
-    margin: 30,
+    width: '85%',
+    alignSelf: 'center',
+    marginBottom: 50,
     paddingVertical: 30,
     paddingHorizontal: 10,
     borderRadius: 10,
+    shadowColor: '#171717',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
   },
   outerContainer: {
     height: '100%',
