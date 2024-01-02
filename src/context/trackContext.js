@@ -19,12 +19,13 @@ const trackReducer = (state, action) => {
 };
 
 const fetchTracks = dispatch => () => {};
-const createTrack = dispatch => (name, locations, loading) => {
+const createTrack = dispatch => (name, locations, loading, changeSavedStatus) => {
   loading(true);
   dispatch({ type: 'delete_error' });
   trails.post('/tracks', { name, locations }).then((res) => {
     dispatch({ type: 'store_trail', payload: res?.data });
     dispatch({ type: 'add_success', payload: res?.data.message });
+    changeSavedStatus(true);
     loading(false);
     setTimeout(() => {
       dispatch({ type: 'delete_success' });

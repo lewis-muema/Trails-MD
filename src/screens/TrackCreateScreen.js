@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useState } from 'react';
 import {
-  View, StyleSheet,
+  View, StyleSheet, Text, TouchableOpacity,
 } from 'react-native';
 import { Input, Button } from 'react-native-elements';
-import { useIsFocused } from '@react-navigation/native';
-import { Feather } from '@expo/vector-icons';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import Map from '../components/map';
 import Banner from '../components/banner';
 import { Context as locationContext } from '../context/locationContext';
@@ -18,14 +18,16 @@ const baseColor = '#316429';
 
 const TrackCreateScreen = () => {
   const isFocused = useIsFocused();
+  const navigation = useNavigation();
   const {
     state: {
-      name, recording, locations,
+      name, recording, locations, trackStatus, savedStatus,
     },
     addLocation,
     startRecording,
     stopRecording,
     changeName,
+    reset,
   } = useContext(locationContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
@@ -44,6 +46,11 @@ const TrackCreateScreen = () => {
     }
   };
 
+  const viewTrail = () => {
+    navigation.navigate('Tracks', { screen: 'TrackDetail' });
+    reset();
+  };
+
   return <View style={styles.outerContainer}>
     <View style={styles.mapContainer}>
       <Map />
@@ -51,9 +58,19 @@ const TrackCreateScreen = () => {
     <Metrics />
     <View style={styles.controls}>
       <View style={styles.inputCard}>
+        {
+          !recording && locations.length && savedStatus
+            ? <TouchableOpacity style={{ zIndex: 1000 }} onPress={() => reset()}>
+                <View style={styles.addTrail}>
+                  <Ionicons name="add-circle-sharp" size={16} color="#b6541c" />
+                  <Text style={styles.addTrailText}>Add New Trail</Text>
+                </View>
+              </TouchableOpacity>
+            : null
+        }
         <Input
           ref={nameRef}
-          label='Trail title'
+          label='Trail Name'
           placeholder='Enter name'
           value={name}
           onChangeText={(val) => {
@@ -71,14 +88,14 @@ const TrackCreateScreen = () => {
         />
         <View style={styles.createTrackContainer}>
           <Button
-            title={recording ? 'Stop Tracking' : 'Start Tracking'}
+            title={trackStatus}
             buttonStyle={recording ? styles.saveTrackButton : styles.createTrackButton}
             disabledStyle={styles.createTrackButton}
             titleStyle={styles.createTrackButtonText}
             onPress={record}
             disabled={loading}
           />
-          {!recording && locations.length
+          {!recording && locations.length && !savedStatus
             ? <Button
               title='Save Trail'
               buttonStyle={styles.saveButton}
@@ -87,6 +104,13 @@ const TrackCreateScreen = () => {
               onPress={() => saveTrack(val => setLoading(val))}
               loading={loading}
               disabled={loading}
+            /> : null}
+          {!recording && locations.length && savedStatus
+            ? <Button
+              title='View Trail'
+              buttonStyle={styles.updateTrackButton}
+              titleStyle={styles.updateTrackButtonText}
+              onPress={() => viewTrail()}
             /> : null}
         </View>
       </View>
@@ -174,12 +198,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 15,
   },
+  updateTrackButton: {
+    borderWidth: 2,
+    borderColor: '#5c2f16',
+    backgroundColor: '#faeed9',
+    borderRadius: 10,
+    width: '100%',
+    fontSize: 14,
+    marginTop: 15,
+  },
+  updateTrackButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#b6541c',
+  },
   error: {
     marginHorizontal: 30,
     position: 'absolute',
-    top: -50,
+    top: -70,
     width: '85%',
     alignSelf: 'center',
+  },
+  addTrail: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    marginRight: 10,
+    marginBottom: -20,
+    zIndex: 1000,
+    backgroundColor: '#faeed9',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    shadowColor: '#171717',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+  },
+  addTrailText: {
+    fontWeight: '600',
+    fontSize: 14,
+    color: '#b6541c',
+    marginLeft: 2,
   },
 });
 

@@ -23,6 +23,22 @@ const locationReducer = (state, action) => {
       return { ...state, distance: Math.trunc(totalDistance(state)) };
     case 'refresh_distance':
       return { ...state, distance: Math.trunc(refreshDistance(state)) };
+    case 'tracking_status':
+      return { ...state, trackStatus: action.payload };
+    case 'saved_status':
+      return { ...state, savedStatus: action.payload };
+    case 'reset':
+      return {
+        ...state,
+        recording: false,
+        name: '',
+        locations: [],
+        index: 0,
+        polylines: [],
+        distance: 0,
+        trackStatus: 'Start Tracking',
+        savedStatus: false,
+      };
     default:
       return state;
   }
@@ -79,12 +95,21 @@ const totalDistance = (state) => {
 const changeName = dispatch => (name) => {
   dispatch({ type: 'change_name', payload: name });
 };
+const changeSavedStatus = dispatch => (status) => {
+  dispatch({ type: 'saved_status', payload: status });
+};
+const reset = dispatch => () => {
+  dispatch({ type: 'reset' });
+};
 const startRecording = dispatch => () => {
   dispatch({ type: 'start_recording' });
   dispatch({ type: 'refresh_distance' });
+  dispatch({ type: 'tracking_status', payload: 'Stop Tracking' });
 };
 const stopRecording = dispatch => () => {
   dispatch({ type: 'stop_recording' });
+  dispatch({ type: 'tracking_status', payload: 'Continue Tracking' });
+  dispatch({ type: 'saved_status', payload: false });
 };
 const addLocation = dispatch => (location, recording) => {
   if (recording) {
@@ -106,6 +131,8 @@ export const { Context, Provider } = createDataContext(
     addLocation,
     changeName,
     setPolyLines,
+    changeSavedStatus,
+    reset,
   },
   {
     recording: false,
@@ -115,5 +142,7 @@ export const { Context, Provider } = createDataContext(
     index: 0,
     polylines: [],
     distance: 0,
+    trackStatus: 'Start Tracking',
+    savedStatus: false,
   },
 );

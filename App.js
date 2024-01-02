@@ -18,18 +18,18 @@ const Bottom = createBottomTabNavigator();
 
 function Tracks() {
   return (
-    <Stack.Navigator initialRouteName="Signin" screenOptions={{
+    <Stack.Navigator initialRouteName="TrackList" screenOptions={{
       headerShown: false,
     }}>
       <Stack.Screen name="TrackList" component={TrackListScreen} options={{ title: 'Tracks' }} />
-      <Stack.Screen name="TrackDetail" component={TrackDetailScreen} options={{ title: 'Track detail' }} />
+      <Stack.Screen name="TrackDetail" component={TrackDetailScreen} options={{ title: 'Track details' }} />
     </Stack.Navigator>
   );
 }
 
 function Home() {
   return (
-    <Bottom.Navigator initialRouteName="Index" screenOptions={{
+    <Bottom.Navigator initialRouteName="Tracks" screenOptions={{
       headerShown: false,
     }}>
       <Bottom.Screen name="Tracks" component={Tracks} options={{ title: 'Tracks' }} />

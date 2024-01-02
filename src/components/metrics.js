@@ -28,7 +28,7 @@ const Metrics = () => {
                       <View style={styles.metricsValuesMini}>
                         <Text style={styles.metricsValuesTopMini}>Speed</Text>
                         <Text style={styles.metricsValuesBottomMini}>
-                          { `${Math.trunc(currentLocation?.coords?.speed * 3.6)} km/h` }
+                          { currentLocation?.coords?.speed ? `${Math.trunc(currentLocation?.coords?.speed * 3.6)} km/h` : '0 km/h' }
                         </Text>
                       </View>
                     </View>
