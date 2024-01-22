@@ -6,6 +6,7 @@ import {
 import MapView, {
   Polyline, Marker, showCallout, hideCallout,
 } from 'react-native-maps';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Context as LocationContext } from '../context/locationContext';
 
 const Map = () => {
@@ -39,7 +40,7 @@ const Map = () => {
     { polylines.map((polyline, index) => <Polyline
       key={index}
       strokeWidth={4}
-      strokeColor="green"
+      strokeColor="#113231"
       coordinates={polyline.map(loc => loc.coords)}/>)
     }
     { polylines.map((polyline, index) => <Marker
@@ -48,7 +49,9 @@ const Map = () => {
         title={`Waypoint ${index + 1} starts here`}
         onPress={showCallout}
         onDeselect={hideCallout}
-      />)
+      >
+        <Ionicons name="md-flag-sharp" style={styles.flag} color="green" />
+      </Marker>)
     }
     { polylines.map((polyline, index) => <Marker
         key={index}
@@ -56,14 +59,21 @@ const Map = () => {
         title={`Waypoint ${index + 1} ends here`}
         onPress={showCallout}
         onDeselect={hideCallout}
-      />)
+      >
+        { currentLocation.coords.longitude === polyline[polyline.length - 1].coords.longitude
+        && currentLocation.coords.latitude === polyline[polyline.length - 1].coords.latitude
+          ? <FontAwesome5 name="walking" style={styles.flag} color="#5c2f16" />
+          : <Ionicons name="md-flag-sharp" style={styles.flag} color="red" /> }
+      </Marker>)
     }
     <Marker
       coordinate={currentLocation.coords}
       title='You are here'
       onPress={showCallout}
       onDeselect={hideCallout}
-    />
+    >
+      <FontAwesome5 name="walking" style={styles.flag} color="#5c2f16" />
+    </Marker>
   </MapView>;
 };
 
@@ -79,6 +89,11 @@ const styles = StyleSheet.create({
     color: 'grey',
     fontSize: 17,
     fontWeight: '500',
+  },
+  flag: {
+    marginBottom: 15,
+    marginLeft: 10,
+    fontSize: 25,
   },
 });
 

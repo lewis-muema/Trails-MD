@@ -1,27 +1,30 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, {
+  useCallback, useContext, useState, useEffect,
+} from 'react';
 import {
   View, StyleSheet, Text, TouchableOpacity,
 } from 'react-native';
 import { Input, Button } from 'react-native-elements';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation, CommonActions } from '@react-navigation/native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import Map from '../components/map';
 import Banner from '../components/banner';
 import { Context as locationContext } from '../context/locationContext';
+import { Context as trackContext } from '../context/trackContext';
 import useLocation from '../hooks/useLocation';
 import useSaveTrack from '../hooks/useSaveTrack';
 import Metrics from '../components/metrics';
 // import '../_mockLocation';
 
 const nameRef = React.createRef();
-const baseColor = '#316429';
+const baseColor = '#113231';
 
 const TrackCreateScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const {
     state: {
-      name, recording, locations, trackStatus, savedStatus,
+      name, recording, locations, trackStatus, savedStatus, mode,
     },
     addLocation,
     startRecording,
@@ -29,6 +32,7 @@ const TrackCreateScreen = () => {
     changeName,
     reset,
   } = useContext(locationContext);
+  const { state: { trail }, setMapCenter } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,9 +51,31 @@ const TrackCreateScreen = () => {
   };
 
   const viewTrail = () => {
-    navigation.navigate('Tracks', { screen: 'TrackDetail' });
+    setMapCenter(trail);
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{
+          name: 'TrackList',
+        }],
+      }),
+    );
+    navigation.navigate('Tracks', {
+      screen: 'TrackDetail',
+      params: {
+        id: trail.id,
+      },
+    });
     reset();
   };
+
+  useEffect(() => {
+    navigation.addListener('focus', () => {
+      if (mode === 'create') {
+        reset();
+      }
+    });
+  }, []);
 
   return <View style={styles.outerContainer}>
     <View style={styles.mapContainer}>
@@ -139,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   inputCard: {
-    backgroundColor: '#d2e3c0',
+    backgroundColor: '#faeed9',
     width: '85%',
     alignSelf: 'center',
     marginBottom: 50,

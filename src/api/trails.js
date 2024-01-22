@@ -27,6 +27,7 @@ instance.interceptors.response.use(
     if (err.response.status === 401 && err.response.data?.message === 'You are not logged in') {
       await AsyncStorage.removeItem('token');
       RootNavigation.navigate('Auth', { screen: 'Signin' });
+      throw err;
     } else {
       throw err;
     }

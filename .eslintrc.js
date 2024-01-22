@@ -22,5 +22,6 @@ module.exports = {
     'no-plusplus': 'off',
     'no-unused-expressions': 'off',
     'no-param-reassign': 'off',
+    'no-unused-vars': 'off',
   },
 };

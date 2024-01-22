@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AccountScreen from './src/screens/AccountScreen';
@@ -31,10 +32,28 @@ function Home() {
   return (
     <Bottom.Navigator initialRouteName="Tracks" screenOptions={{
       headerShown: false,
+      tabBarActiveTintColor: '#faeed9',
+      tabBarInactiveTintColor: '#cf7033',
+      tabBarStyle: { backgroundColor: '#113231', borderTopWidth: 0, justifyContent: 'center' },
     }}>
-      <Bottom.Screen name="Tracks" component={Tracks} options={{ title: 'Tracks' }} />
-      <Bottom.Screen name="TrackCreate" component={TrackCreateScreen} options={{ title: 'Create track' }} />
-      <Bottom.Screen name="Account" component={AccountScreen} options={{ title: 'Account' }} />
+      <Bottom.Screen name="Tracks" component={Tracks} options={{
+        title: 'Trails',
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="trail-sign-outline" color={color} size={size} />
+        ),
+      }} />
+      <Bottom.Screen name="TrackCreate" component={TrackCreateScreen} options={{
+        title: 'Create track',
+        tabBarIcon: ({ color, size }) => (
+          <MaterialIcons name="my-location" color={color} size={size} />
+        ),
+      }} />
+      <Bottom.Screen name="Account" component={AccountScreen} options={{
+        title: 'Account',
+        tabBarIcon: ({ color, size }) => (
+          <FontAwesome5 name="user" color={color} size={size} />
+        ),
+      }} />
     </Bottom.Navigator>
   );
 }

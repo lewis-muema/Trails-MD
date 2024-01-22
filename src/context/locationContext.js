@@ -1,5 +1,5 @@
 import createDataContext from './createDataContext';
-import getDistanceFromLatLonInKm from '../components/distance';
+import distanceCalc from '../components/distanceCalc';
 
 const locationReducer = (state, action) => {
   switch (action.type) {
@@ -17,6 +17,12 @@ const locationReducer = (state, action) => {
       };
     case 'set_polylines':
       return { ...state, polylines: createLocs(state) };
+    case 'set_locations':
+      return { ...state, locations: action.payload };
+    case 'set_mode':
+      return { ...state, mode: action.payload };
+    case 'set_index':
+      return { ...state, index: action.payload };
     case 'change_name':
       return { ...state, name: action.payload };
     case 'set_distance':
@@ -38,6 +44,7 @@ const locationReducer = (state, action) => {
         distance: 0,
         trackStatus: 'Start Tracking',
         savedStatus: false,
+        mode: 'create',
       };
     default:
       return state;
@@ -55,28 +62,13 @@ const createLocs = (state) => {
 };
 
 const refreshDistance = (state) => {
-  let totalDist = 0;
-  state.polylines.forEach((locations) => {
-    let distance = 0;
-    if (locations.length > 1) {
-      let prevLong = locations[0]?.coords?.longitude;
-      let prevLat = locations[0]?.coords?.latitude;
-      locations.forEach((loc, i) => {
-        if (i > 0) {
-          prevLong = locations[i - 1]?.coords?.longitude;
-          prevLat = locations[i - 1]?.coords?.latitude;
-          distance = getDistanceFromLatLonInKm(
-            prevLat, prevLong, loc?.coords?.latitude, loc?.coords?.longitude,
-          ) + distance;
-        }
-      });
-    }
-    totalDist = distance + totalDist;
-  });
+  const { getTotalDistance } = distanceCalc();
+  const totalDist = getTotalDistance(state.polylines);
   return totalDist;
 };
 
 const totalDistance = (state) => {
+  const { getDistanceFromLatLonInKm } = distanceCalc();
   let distance = 0;
   const polyCount = state.polylines.length;
   const currentPoly = polyCount > 0 ? state.polylines[polyCount - 1] : [];
@@ -123,6 +115,17 @@ const setPolyLines = dispatch => () => {
   dispatch({ type: 'set_polylines' });
 };
 
+const setLocations = dispatch => (name, locations, index) => {
+  dispatch({ type: 'set_locations', payload: locations });
+  dispatch({ type: 'set_index', payload: index });
+  dispatch({ type: 'change_name', payload: name });
+};
+
+const setMode = dispatch => (mode) => {
+  dispatch({ type: 'set_mode', payload: mode });
+};
+
+
 export const { Context, Provider } = createDataContext(
   locationReducer,
   {
@@ -132,7 +135,9 @@ export const { Context, Provider } = createDataContext(
     changeName,
     setPolyLines,
     changeSavedStatus,
+    setLocations,
     reset,
+    setMode,
   },
   {
     recording: false,
@@ -144,5 +149,6 @@ export const { Context, Provider } = createDataContext(
     distance: 0,
     trackStatus: 'Start Tracking',
     savedStatus: false,
+    mode: 'create',
   },
 );
