@@ -151,6 +151,29 @@ const deleteTrack = dispatch => (loading, id, navigateToList) => {
   });
 };
 
+const deleteManyTracks = dispatch => (loading, trls) => {
+  loading(true);
+  const ids = trls.filter(trl => trl.selected === true).map(({ id }) => id);
+  trails.post('/delete-tracks', ids).then((response) => {
+    trails.get('/tracks').then((res) => {
+      loading(false);
+      dispatch({ type: 'add_success', payload: response?.data.message });
+      setTimeout(() => {
+        dispatch({ type: 'delete_success' });
+      }, 5000);
+      dispatch({ type: 'set_multiselect', payload: { val: false, count: 0 } });
+      dispatch({ type: 'fetch_trails', payload: res?.data?.tracks.reverse() });
+      dispatch({ type: 'total_distance', payload: totalDistance(res?.data?.tracks) });
+    }).catch(() => {
+      loading(false);
+      dispatch({ type: 'fetch_trails', payload: [] });
+    });
+  }).catch((err) => {
+    loading(false);
+    dispatch({ type: 'add_error', payload: err?.response?.data?.message });
+  });
+};
+
 const createTrack = dispatch => (name, locations, loading, changeSavedStatus) => {
   loading(true);
   dispatch({ type: 'delete_error' });
@@ -180,6 +203,7 @@ export const { Provider, Context } = createDataContext(
     fetchOneTrack,
     setMapCenter,
     deleteTrack,
+    deleteManyTracks,
     editSavedTrack,
     multiSelect,
     clearSelect,

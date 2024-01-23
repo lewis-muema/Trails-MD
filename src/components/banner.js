@@ -30,6 +30,10 @@ const Banner = ({ message, type }) => {
       padding: 10,
       borderRadius: 10,
       borderWidth: 1,
+      shadowColor: 'black',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.5,
+      shadowRadius: 5,
     },
     text: {
       ...bannerType(),

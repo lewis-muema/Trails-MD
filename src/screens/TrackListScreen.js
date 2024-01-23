@@ -13,6 +13,7 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as locationContext } from '../context/locationContext';
 import MiniMap from '../components/miniMap';
+import Banner from '../components/banner';
 
 const TrackListScreen = () => {
   const navigation = useNavigation();
@@ -21,9 +22,9 @@ const TrackListScreen = () => {
   } = useContext(AuthContext);
   const {
     state: {
-      trails, distance, multiselect, selectCount,
+      trails, distance, multiselect, selectCount, success, error,
     },
-    fetchTracks, setMapCenter, multiSelect, clearSelect,
+    fetchTracks, setMapCenter, multiSelect, clearSelect, deleteManyTracks,
   } = useContext(trackContext);
   const { setMode } = useContext(locationContext);
   const [loading, setLoading] = useState(false);
@@ -71,8 +72,12 @@ const TrackListScreen = () => {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.actionsRow}>
-                  <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
-                  <Text style={styles.actionTitles}>Delete</Text>
+                  <TouchableOpacity
+                    onPress={() => deleteManyTracks(val => setLoading(val), trails)}
+                  >
+                    <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
+                    <Text style={styles.actionTitles}>Delete</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -119,6 +124,14 @@ const TrackListScreen = () => {
                 </TouchableOpacity>
               }
             />
+            { error ? <View style={styles.error}>
+              <Banner message={error} type='error'></Banner>
+              </View> : null
+            }
+            { success ? <View style={styles.error}>
+              <Banner message={success} type='success'></Banner>
+              </View> : null
+            }
           </View>
         </View>
     </SafeAreaView>
@@ -270,6 +283,13 @@ const styles = StyleSheet.create({
   },
   hidden: {
     display: 'none',
+  },
+  error: {
+    marginHorizontal: 30,
+    position: 'absolute',
+    bottom: 30,
+    width: '85%',
+    alignSelf: 'center',
   },
 });
 
