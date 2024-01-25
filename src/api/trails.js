@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as RootNavigation from '../RootNavigation';
 
 const instance = axios.create({
-  baseURL: 'https://tracks-408014.uc.r.appspot.com',
+  baseURL: 'https://trailsmd.uc.r.appspot.com',
 });
 
 instance.interceptors.request.use(

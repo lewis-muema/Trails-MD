@@ -9,9 +9,10 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Spacer from '../components/Spacer';
 import Banner from '../components/banner';
+import Loader from '../components/loader';
 import { Context as AuthContext } from '../context/AuthContext';
 
-const baseColor = '#316429';
+const baseColor = '#113231';
 const emailRef = React.createRef();
 const passRef = React.createRef();
 
@@ -46,7 +47,6 @@ const SigninScreen = () => {
   };
 
   useEffect(() => {
-    validateAuth();
     navigation.addListener('focus', () => {
       clearErrors();
       setEmail('');
@@ -56,7 +56,10 @@ const SigninScreen = () => {
 
   return <View style={styles.container}>
     <Spacer />
-      <Image style={styles.trailsLogo} source={require('../../assets/hiking.png')} />
+      <View>
+        <Loader loading={true} screen={false} message='' centre={false} />
+        <Image style={styles.trailsLogo} source={require('../../assets/logo.png')} />
+      </View>
       <View style={styles.inputContainer}>
         <Input
         ref={emailRef}
@@ -117,6 +120,9 @@ const SigninScreen = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.signin}>Don't have an account? Sign up here</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Passwordreset')}>
+          <Text style={styles.reset}>Forgot password? Reset it here</Text>
+        </TouchableOpacity>
       </Spacer>
       <Spacer />
       <Spacer />
@@ -126,7 +132,7 @@ const SigninScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#d2e3c0',
+    backgroundColor: '#faeed9',
     justifyContent: 'center',
   },
   title: {
@@ -135,10 +141,11 @@ const styles = StyleSheet.create({
   },
   trailsLogo: {
     width: 250,
-    height: 250,
+    height: 100,
     resizeMode: 'contain',
     alignSelf: 'center',
     marginBottom: 20,
+    marginTop: -50,
   },
   label: {
     color: baseColor,
@@ -156,6 +163,14 @@ const styles = StyleSheet.create({
     color: baseColor,
     fontSize: 16,
     fontWeight: '600',
+    marginTop: 20,
+  },
+  reset: {
+    textAlign: 'center',
+    color: '#5c2f16',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 20,
   },
   signupButton: {
     backgroundColor: baseColor,

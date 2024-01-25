@@ -4,7 +4,9 @@ import {
   StyleSheet, Image, View, Text,
 } from 'react-native';
 
-const Loader = ({ loading, screen, message }) => {
+const Loader = ({
+  loading, screen, message, centre,
+}) => {
   const [loadVal, setLoadVal] = useState(1);
   const [ellipsis, setEllipsis] = useState('.');
   const loadingScreenImage = (num) => {
@@ -22,6 +24,24 @@ const Loader = ({ loading, screen, message }) => {
       return image2;
     }
     return image1;
+  };
+
+  const loaderType = () => {
+    let styles = {};
+    if (screen) {
+      styles.backgroundColor = '#000000ad';
+    }
+    if (centre) {
+      styles = {
+        ...styles,
+        position: 'absolute',
+        zIndex: 1000,
+        justifyContent: 'center',
+        height: '100%',
+        paddingTop: '40%',
+      };
+    }
+    return styles;
   };
 
   const screenStyle = () => {
@@ -42,6 +62,36 @@ const Loader = ({ loading, screen, message }) => {
     }
   }, [loading, loadVal]);
 
+  const styles = StyleSheet.create({
+    spacer: {
+      marginVertical: 10,
+      marginHorizontal: 20,
+    },
+    joinImg: {
+      width: 300,
+      height: 250,
+      resizeMode: 'contain',
+    },
+    loadingText: {
+      color: '#faeed9',
+      fontSize: 18,
+      fontWeight: '600',
+    },
+    loadingTitle: {
+      flexDirection: 'row',
+      textAlign: 'center',
+      justifyContent: 'center',
+    },
+    loaderContainer: {
+      ...loaderType(),
+      alignItems: 'center',
+      width: '100%',
+    },
+    NoloadingContainer: {
+      display: 'none',
+    },
+  });
+
   return <View style={
       loading ? screenStyle() : styles.NoloadingContainer
     }>
@@ -52,49 +102,5 @@ const Loader = ({ loading, screen, message }) => {
         </View>
     </View>;
 };
-
-const styles = StyleSheet.create({
-  spacer: {
-    marginVertical: 10,
-    marginHorizontal: 20,
-  },
-  joinImg: {
-    width: 300,
-    height: 250,
-    resizeMode: 'contain',
-  },
-  loadingText: {
-    color: '#faeed9',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  loadingTitle: {
-    flexDirection: 'row',
-    textAlign: 'center',
-    justifyContent: 'center',
-  },
-  loaderContainer: {
-    position: 'absolute',
-    zIndex: 1000,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%',
-    paddingTop: '40%',
-  },
-  darkLoader: {
-    position: 'absolute',
-    zIndex: 1000,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%',
-    paddingTop: '40%',
-    backgroundColor: '#000000ad',
-  },
-  NoloadingContainer: {
-    display: 'none',
-  },
-});
 
 export default Loader;

@@ -58,7 +58,7 @@ const TrackListScreen = () => {
 
   return <ImageBackground source={require('../../assets/bg4.png')} resizeMode="cover" style={styles.bg}>
     <SafeAreaView>
-        <Loader loading={loading} screen={false} message='Loading' />
+        <Loader loading={loading} screen={false} message='Loading' centre={true} />
         <View style={styles.container}>
           <View style={styles.flexRow}>
             <Image style={styles.trailsLogo} source={require('../../assets/logo.png')} />
@@ -163,6 +163,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: '85%',
+    zIndex: 1000,
+    paddingTop: '35%',
   },
   joinImg: {
     width: 300,

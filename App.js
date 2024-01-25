@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AccountScreen from './src/screens/AccountScreen';
 import SigninScreen from './src/screens/SigninScreen';
 import SignupScreen from './src/screens/SignupScreen';
+import PasswordResetScreen from './src/screens/PasswordReset';
 import TrackCreateScreen from './src/screens/TrackCreateScreen';
 import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
@@ -65,6 +66,7 @@ function Auth() {
     }}>
       <Stack.Screen name="Signin" component={SigninScreen} options={{ title: 'Sign in' }} />
       <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign up' }} />
+      <Stack.Screen name="Passwordreset" component={PasswordResetScreen} options={{ title: 'Password reset' }} />
     </Stack.Navigator>
   );
 }

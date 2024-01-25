@@ -143,7 +143,7 @@ const TrackDetailScreen = ({ route }) => {
           <View style={styles.outerContainer}>
             <View style={styles.mapContainer}>
               { loading || trail.locations === undefined
-                ? <Loader loading={loading} screen={true} message={ message }/>
+                ? <Loader loading={loading} screen={true} message={ message } centre={true}/>
                 : null }
               <TrailMap locations={trail} mapCenter={mapCenter} />
               <View style={styles.actionsMenu}>
