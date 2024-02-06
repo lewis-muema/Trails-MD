@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
 import AccountScreen from './src/screens/AccountScreen';
 import SigninScreen from './src/screens/SigninScreen';
 import SignupScreen from './src/screens/SignupScreen';
@@ -13,6 +16,7 @@ import TrackListScreen from './src/screens/TrackListScreen';
 import { Provider as AuthProvider } from './src/context/AuthContext';
 import { Provider as LocationProvider } from './src/context/locationContext';
 import { Provider as TrackProvider } from './src/context/trackContext';
+import { Provider as PaletteProvider, Context as PaletteContext } from './src/context/paletteContext';
 import { navigationRef } from './src/RootNavigation';
 
 const Stack = createNativeStackNavigator();
@@ -30,12 +34,13 @@ function Tracks() {
 }
 
 function Home() {
+  const { state: { palette } } = useContext(PaletteContext);
   return (
     <Bottom.Navigator initialRouteName="Tracks" screenOptions={{
       headerShown: false,
-      tabBarActiveTintColor: '#faeed9',
-      tabBarInactiveTintColor: '#cf7033',
-      tabBarStyle: { backgroundColor: '#113231', borderTopWidth: 0, justifyContent: 'center' },
+      tabBarActiveTintColor: palette.background,
+      tabBarInactiveTintColor: palette.buttonsInactive,
+      tabBarStyle: { backgroundColor: palette.text, borderTopWidth: 0, justifyContent: 'center' },
     }}>
       <Bottom.Screen name="Tracks" component={Tracks} options={{
         title: 'Trails',
@@ -72,6 +77,30 @@ function Auth() {
 }
 
 function App() {
+  const { changeBG, changeTheme, fontsLoadedStatus } = useContext(PaletteContext);
+  const loadTheme = async () => {
+    SplashScreen.preventAutoHideAsync().catch(() => {});
+    try {
+      const theme = await AsyncStorage.getItem('theme');
+      const bg = await AsyncStorage.getItem('bg');
+      if (theme !== null) {
+        changeTheme(JSON.parse(theme));
+      }
+      if (bg !== null) {
+        changeBG(JSON.parse(bg));
+      }
+      await Font.loadAsync({
+        'manuscript-font': require('./assets/fonts/Manuscript.ttf'),
+      });
+      fontsLoadedStatus(true);
+      await SplashScreen.hideAsync();
+    } catch (e) {
+      // error reading value
+    }
+  };
+  useEffect(() => {
+    loadTheme();
+  }, []);
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName="Home" screenOptions={{
@@ -85,11 +114,13 @@ function App() {
 }
 
 export default () => {
-  return <TrackProvider>
-    <LocationProvider>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </LocationProvider>
-  </TrackProvider>;
+  return <PaletteProvider>
+    <TrackProvider>
+      <LocationProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </LocationProvider>
+  </TrackProvider>
+  </PaletteProvider>;
 };

@@ -11,13 +11,13 @@ import Map from '../components/map';
 import Banner from '../components/banner';
 import { Context as locationContext } from '../context/locationContext';
 import { Context as trackContext } from '../context/trackContext';
+import { Context as PaletteContext } from '../context/paletteContext';
 import useLocation from '../hooks/useLocation';
 import useSaveTrack from '../hooks/useSaveTrack';
 import Metrics from '../components/metrics';
 // import '../_mockLocation';
 
 const nameRef = React.createRef();
-const baseColor = '#113231';
 
 const TrackCreateScreen = () => {
   const isFocused = useIsFocused();
@@ -32,6 +32,7 @@ const TrackCreateScreen = () => {
     changeName,
     reset,
   } = useContext(locationContext);
+  const { state: { palette } } = useContext(PaletteContext);
   const { state: { trail }, setMapCenter } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
@@ -77,6 +78,8 @@ const TrackCreateScreen = () => {
     });
   }, []);
 
+  const styles = paletteStyles(palette);
+
   return <View style={styles.outerContainer}>
     <View style={styles.mapContainer}>
       <Map />
@@ -109,7 +112,7 @@ const TrackCreateScreen = () => {
           autoCorrect={false}
           errorMessage={error}
           leftIcon={
-            <Feather name="map-pin" size={18} color={baseColor} />
+            <Feather name="map-pin" size={18} color={palette.text} />
           }
         />
         <View style={styles.createTrackContainer}>
@@ -152,7 +155,7 @@ const TrackCreateScreen = () => {
   </View>;
 };
 
-const styles = StyleSheet.create({
+const paletteStyles = palette => StyleSheet.create({
   title: {
     textAlign: 'center',
     fontWeight: '600',
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   inputCard: {
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     width: '85%',
     alignSelf: 'center',
     marginBottom: 50,
@@ -191,7 +194,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   label: {
-    color: baseColor,
+    color: palette.text,
     fontSize: 14,
   },
   inputTextSytle: {
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   createTrackButton: {
-    backgroundColor: baseColor,
+    backgroundColor: palette.text,
     borderRadius: 10,
     width: '100%',
     fontSize: 14,
@@ -226,8 +229,8 @@ const styles = StyleSheet.create({
   },
   updateTrackButton: {
     borderWidth: 2,
-    borderColor: '#5c2f16',
-    backgroundColor: '#faeed9',
+    borderColor: palette.metricsBottom,
+    backgroundColor: palette.background,
     borderRadius: 10,
     width: '100%',
     fontSize: 14,
@@ -236,7 +239,7 @@ const styles = StyleSheet.create({
   updateTrackButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#b6541c',
+    color: palette.metricsTop,
   },
   error: {
     marginHorizontal: 30,
@@ -251,7 +254,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: -20,
     zIndex: 1000,
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -263,7 +266,7 @@ const styles = StyleSheet.create({
   addTrailText: {
     fontWeight: '600',
     fontSize: 14,
-    color: '#b6541c',
+    color: palette.metricsTop,
     marginLeft: 2,
   },
 });

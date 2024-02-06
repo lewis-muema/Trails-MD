@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Chart, Line, Area, HorizontalAxis, VerticalAxis,
 } from 'react-native-responsive-linechart';
 import moment from 'moment';
+import { Context as PaletteContext } from '../context/paletteContext';
 
 const lineChart = ({ data, field }) => {
+  const { state: { palette } } = useContext(PaletteContext);
   const [x, setX] = useState([]);
   const [y, setY] = useState([]);
   const [minY, setMinY] = useState(0);
@@ -49,8 +51,8 @@ const lineChart = ({ data, field }) => {
             <VerticalAxis
               tickCount={5}
               theme={{
-                axis: { stroke: { color: '#113231', width: 2 } },
-                ticks: { stroke: { color: '#113231', width: 2 } },
+                axis: { stroke: { color: palette.text, width: 2 } },
+                ticks: { stroke: { color: palette.text, width: 2 } },
                 labels: { label: { width: 5 }, formatter: v => `${v.toFixed(1)}` },
                 grid: {
                   visible: false,
@@ -60,8 +62,8 @@ const lineChart = ({ data, field }) => {
             <HorizontalAxis
               tickCount={10}
               theme={{
-                axis: { stroke: { color: '#113231', width: 2 } },
-                ticks: { stroke: { color: '#113231', width: 2 } },
+                axis: { stroke: { color: palette.text, width: 2 } },
+                ticks: { stroke: { color: palette.text, width: 2 } },
                 labels: { label: { rotation: 0 }, formatter: v => String(x[parseInt(v, 10)]) },
                 grid: {
                   visible: false,
@@ -70,11 +72,11 @@ const lineChart = ({ data, field }) => {
             />
             <Line
               theme={{
-                stroke: { color: '#113231', width: 2 },
+                stroke: { color: palette.text, width: 2 },
               }}
               smoothing="cubic-spline"
             />
-            <Area theme={{ gradient: { from: { color: '#113231', opacity: 0.4 }, to: { color: '#115b118c', opacity: 0.4 } } }} smoothing="cubic-spline" />
+            <Area theme={{ gradient: { from: { color: palette.text, opacity: 0.4 }, to: { color: palette.text, opacity: 0.4 } } }} smoothing="cubic-spline" />
           </Chart>;
 };
 

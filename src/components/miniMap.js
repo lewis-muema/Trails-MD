@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   StyleSheet, View, Text,
 } from 'react-native';
@@ -9,10 +9,12 @@ import MapView, {
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import moment from 'moment';
 import distanceCalc from './distanceCalc';
+import { Context as PaletteContext } from '../context/paletteContext';
 
 const MiniMap = ({ locations }) => {
   const { centerOfMap, getPolylines, getTotalDistance } = distanceCalc();
   const [polys, setPolys] = useState(0);
+  const { state: { palette } } = useContext(PaletteContext);
 
   const center = () => {
     return centerOfMap(locations.locations, 0.008);
@@ -29,6 +31,8 @@ const MiniMap = ({ locations }) => {
   useEffect(() => {
     getDistance();
   }, []);
+
+  const styles = paletteStyles(palette);
 
   return <View style={locations.selected ? styles.mapContainerSelected : styles.mapContainer}>
     <View style={locations.selected ? styles.selectOverlay : styles.hidden}>
@@ -81,10 +85,10 @@ const MiniMap = ({ locations }) => {
   </View>;
 };
 
-const styles = StyleSheet.create({
+const paletteStyles = palette => StyleSheet.create({
   mapContainer: {
     width: '100%',
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     marginTop: 10,
     borderRadius: 10,
     padding: 5,
@@ -94,7 +98,7 @@ const styles = StyleSheet.create({
   },
   mapContainerSelected: {
     width: '100%',
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     marginTop: 10,
     borderRadius: 10,
     padding: 5,
@@ -103,7 +107,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   selectOverlay: {
-    backgroundColor: '#faeed97a',
+    backgroundColor: palette.background,
     position: 'absolute',
     top: 0,
     bottom: 0,
@@ -117,7 +121,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     borderWidth: 2,
-    borderColor: '#faeed9',
+    borderColor: palette.background,
     borderRadius: 10,
   },
   loadingText: {
@@ -147,20 +151,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 10,
     marginHorizontal: 5,
-    color: '#113231',
+    color: palette.text,
   },
   mapDetailsLeftTextBottom: {
     fontSize: 12,
     fontWeight: '500',
     marginBottom: 10,
     marginHorizontal: 5,
-    color: '#5c2f16',
+    color: palette.metricsBottom,
   },
   mapDetailsRightText: {
     fontSize: 28,
     fontWeight: '700',
     marginHorizontal: 5,
-    color: '#113231',
+    color: palette.text,
   },
   hidden: {
     display: 'none',

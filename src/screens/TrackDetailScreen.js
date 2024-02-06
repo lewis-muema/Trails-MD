@@ -11,6 +11,7 @@ import {
 } from '@expo/vector-icons';
 import { Context as locationContext } from '../context/locationContext';
 import { Context as trackContext } from '../context/trackContext';
+import { Context as PaletteContext } from '../context/paletteContext';
 import Loader from '../components/loader';
 import LineChart from '../components/lineChart';
 import TrailMap from '../components/trailMap';
@@ -31,6 +32,7 @@ const TrackDetailScreen = ({ route }) => {
     }, fetchOneTrack, deleteTrack,
   } = useContext(trackContext);
   const { setMode } = useContext(locationContext);
+  const { state: { palette } } = useContext(PaletteContext);
 
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const headerScrollHeight = scrollOffsetY.interpolate({
@@ -69,6 +71,9 @@ const TrackDetailScreen = ({ route }) => {
       fetchOneTrack(val => setLoading(val), route.params.id);
     });
   }, []);
+
+  const styles = paletteStyles(palette);
+
   return <View style={styles.detailsContainer}>
       <ScrollView
         onScroll={Animated.event([
@@ -94,7 +99,7 @@ const TrackDetailScreen = ({ route }) => {
             <View style={styles.paceRow}>
               <View>
                 <View style={styles.timeRow}>
-                  <FontAwesome name="clock-o" size={20} color="#113231" />
+                  <FontAwesome name="clock-o" size={20} color={palette.text} />
                   <Text style={styles.timeTaken}>
                     Duration: { moment.duration({ seconds: time / 1000 }).humanize() }
                   </Text>
@@ -102,7 +107,7 @@ const TrackDetailScreen = ({ route }) => {
               </View>
               <View style={styles.paceColRight}>
                 <View style={styles.timeRow}>
-                    <MaterialIcons name="shutter-speed" size={20} color="#113231" />
+                    <MaterialIcons name="shutter-speed" size={20} color={palette.text} />
                     <Text style={styles.timeTaken}>
                       Average pace: {
                       Math.floor(avgPace)
@@ -113,7 +118,7 @@ const TrackDetailScreen = ({ route }) => {
               </View>
             </View>
               <View style={styles.timeRow}>
-                <Ionicons name="speedometer" size={20} color="#113231" />
+                <Ionicons name="speedometer" size={20} color={palette.text} />
                 <Text style={styles.timeTaken}>
                   Speed (km/h)
                 </Text>
@@ -121,7 +126,7 @@ const TrackDetailScreen = ({ route }) => {
               <LineChart data={trail} field={'speed'} />
             <View>
               <View style={styles.timeRow}>
-                <MaterialCommunityIcons name="elevation-rise" size={20} color="#113231" />
+                <MaterialCommunityIcons name="elevation-rise" size={20} color={palette.text} />
                 <Text style={styles.timeTaken}>Elevation (m)</Text>
               </View>
               <LineChart data={trail} field={'altitude'} />
@@ -160,7 +165,7 @@ const TrackDetailScreen = ({ route }) => {
     </View>;
 };
 
-const styles = StyleSheet.create({
+const paletteStyles = palette => StyleSheet.create({
   title: {
     textAlign: 'center',
     fontWeight: '600',
@@ -185,12 +190,12 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     flex: 1,
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
   },
   detailsBottomContainer: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
   },
   mapDetails: {
     flexDirection: 'row',
@@ -205,20 +210,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 10,
     marginHorizontal: 5,
-    color: '#113231',
+    color: palette.text,
   },
   mapDetailsLeftTextBottom: {
     fontSize: 12,
     fontWeight: '500',
     marginBottom: 10,
     marginHorizontal: 5,
-    color: '#5c2f16',
+    color: palette.metricsBottom,
   },
   mapDetailsRightText: {
     fontSize: 28,
     fontWeight: '700',
     marginHorizontal: 5,
-    color: '#113231',
+    color: palette.text,
   },
   timeRow: {
     flexDirection: 'row',
@@ -230,7 +235,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     marginHorizontal: 5,
-    color: '#113231',
+    color: palette.text,
   },
   paceRow: {
     flexDirection: 'row',
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 70,
     right: 25,
-    backgroundColor: '#113231',
+    backgroundColor: palette.text,
     padding: 10,
     borderRadius: 20,
   },
@@ -251,7 +256,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 70,
     right: 25,
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     borderRadius: 20,
     flexDirection: 'row',
   },

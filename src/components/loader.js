@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 const Loader = ({
-  loading, screen, message, centre,
+  loading, screen, message, centre, offset,
 }) => {
   const [loadVal, setLoadVal] = useState(1);
   const [ellipsis, setEllipsis] = useState('.');
@@ -31,6 +31,9 @@ const Loader = ({
     if (screen) {
       styles.backgroundColor = '#000000ad';
     }
+    if (offset) {
+      styles.paddingTop = '40%';
+    }
     if (centre) {
       styles = {
         ...styles,
@@ -38,14 +41,9 @@ const Loader = ({
         zIndex: 1000,
         justifyContent: 'center',
         height: '100%',
-        paddingTop: '40%',
       };
     }
     return styles;
-  };
-
-  const screenStyle = () => {
-    return screen ? styles.darkLoader : styles.loaderContainer;
   };
 
   useEffect(() => {
@@ -93,7 +91,7 @@ const Loader = ({
   });
 
   return <View style={
-      loading ? screenStyle() : styles.NoloadingContainer
+      loading ? styles.loaderContainer : styles.NoloadingContainer
     }>
       { loadingScreenImage(loadVal) }
         <View style={styles.loadingTitle}>

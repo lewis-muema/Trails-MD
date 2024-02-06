@@ -30,6 +30,8 @@ const trackReducer = (state, action) => {
       return { ...state, error: '' };
     case 'set_map_center':
       return { ...state, mapCenter: action.payload };
+    case 'reset':
+      return { ...action.payload };
     default:
       return state;
   }
@@ -195,6 +197,24 @@ const createTrack = dispatch => (name, locations, loading, changeSavedStatus) =>
   });
 };
 
+const resetTrails = dispatch => () => {
+  dispatch({
+    type: 'reset',
+    payload: {
+      trail: {},
+      error: '',
+      success: '',
+      trails: [],
+      distance: 0,
+      mapCenter: {},
+      time: 0,
+      avgPace: 0,
+      multiselect: false,
+      selectCount: 0,
+    },
+  });
+};
+
 export const { Provider, Context } = createDataContext(
   trackReducer,
   {
@@ -207,6 +227,7 @@ export const { Provider, Context } = createDataContext(
     editSavedTrack,
     multiSelect,
     clearSelect,
+    resetTrails,
   },
   {
     trail: {},

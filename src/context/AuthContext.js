@@ -48,6 +48,7 @@ const signup = dispatch => ({ email, password }, loading) => {
 const signin = dispatch => ({ email, password }, loading) => {
   trails.post('/signin', { email, password }).then((res) => {
     storeData('token', res?.data?.token);
+    storeData('email', email);
     dispatch({ type: 'add_token', payload: res?.data?.token });
     loading(false);
     RootNavigation.navigate('Home', { screen: 'Tracks' });

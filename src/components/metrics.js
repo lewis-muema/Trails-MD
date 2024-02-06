@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Context as locationContext } from '../context/locationContext';
+import { Context as PaletteContext } from '../context/paletteContext';
 
 const Metrics = () => {
   const {
@@ -11,12 +12,15 @@ const Metrics = () => {
       currentLocation, distance,
     },
   } = useContext(locationContext);
+  const { state: { palette } } = useContext(PaletteContext);
   const [mini, setMini] = useState(true);
+  const styles = paletteStyles(palette);
+
   return <SafeAreaView style={styles.metricsContainer}>
           { mini
             ? <TouchableOpacity onPress={() => setMini(false)}>
                 <View style={styles.metricsMini}>
-                    <Ionicons style={styles.metricsIcon} name="expand" size={18} color="#5c2f16" />
+                    <Ionicons style={styles.metricsIcon} name="expand" size={18} color={palette.metricsBottom} />
                   <View style={styles.metricsSections}>
                     <View style={styles.metricsSection}>
                       <View style={styles.metricsValuesMini}>
@@ -37,7 +41,7 @@ const Metrics = () => {
               </TouchableOpacity>
             : <TouchableOpacity onPress={() => setMini(true)}>
                 <View style={styles.metrics}>
-                    <MaterialCommunityIcons style={styles.metricsIcon} name="arrow-collapse-all" size={24} color="#5c2f16" />
+                    <MaterialCommunityIcons style={styles.metricsIcon} name="arrow-collapse-all" size={24} color={palette.metricsBottom} />
                   <Text style={styles.metricsTitle}>Metrics</Text>
                   <View style={styles.metricsSections}>
                     <View style={styles.metricsSection}>
@@ -89,11 +93,11 @@ const Metrics = () => {
         </SafeAreaView>;
 };
 
-const styles = StyleSheet.create({
+const paletteStyles = palette => StyleSheet.create({
   metrics: {
     width: '85%',
     alignSelf: 'center',
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     borderRadius: 10,
     padding: 20,
     shadowColor: '#171717',
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
     width: 110,
     alignSelf: 'flex-start',
     marginLeft: '7%',
-    backgroundColor: '#faeed9',
+    backgroundColor: palette.background,
     borderRadius: 10,
     padding: 10,
     shadowColor: '#171717',
@@ -129,7 +133,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: '600',
-    color: '#5c2f16',
+    color: palette.metricsBottom,
     marginBottom: 5,
   },
   metricsValues: {
@@ -139,24 +143,24 @@ const styles = StyleSheet.create({
   metricsValuesTop: {
     fontWeight: '600',
     fontSize: 13,
-    color: '#b6541c',
+    color: palette.metricsTop,
   },
   metricsValuesBottom: {
     fontWeight: '600',
     fontSize: 16,
     marginTop: 2,
-    color: '#5c2f16',
+    color: palette.metricsBottom,
   },
   metricsValuesTopMini: {
     fontWeight: '600',
     fontSize: 12,
-    color: '#b6541c',
+    color: palette.metricsTop,
   },
   metricsValuesBottomMini: {
     fontWeight: '600',
     fontSize: 14,
     marginTop: 2,
-    color: '#5c2f16',
+    color: palette.metricsBottom,
   },
   metricsValuesMini: {
     marginVertical: 3,

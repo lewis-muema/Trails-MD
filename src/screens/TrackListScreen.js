@@ -8,10 +8,12 @@ import {
   FontAwesome, MaterialCommunityIcons, Ionicons, MaterialIcons,
 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import Svg, { Path } from 'react-native-svg';
 import Loader from '../components/loader';
 import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as locationContext } from '../context/locationContext';
+import { Context as PaletteContext } from '../context/paletteContext';
 import MiniMap from '../components/miniMap';
 import Banner from '../components/banner';
 
@@ -20,6 +22,7 @@ const TrackListScreen = () => {
   const {
     validateAuth,
   } = useContext(AuthContext);
+  const { state: { palette, background, fontsLoaded } } = useContext(PaletteContext);
   const {
     state: {
       trails, distance, multiselect, selectCount, success, error,
@@ -52,16 +55,31 @@ const TrackListScreen = () => {
     });
   }, []);
 
+  const styles = paletteStyles(palette, fontsLoaded);
+
   const onRefresh = () => {
     fetchTracks(val => setLoading(val));
   };
 
-  return <ImageBackground source={require('../../assets/bg4.png')} resizeMode="cover" style={styles.bg}>
+  return <ImageBackground source={background.image} resizeMode="cover" style={styles.bg}>
     <SafeAreaView>
-        <Loader loading={loading} screen={false} message='Loading' centre={true} />
+        <Loader offset={true} loading={loading} screen={false} message='Loading' centre={true} />
         <View style={styles.container}>
           <View style={styles.flexRow}>
-            <Image style={styles.trailsLogo} source={require('../../assets/logo.png')} />
+            <View style={styles.trailsLogoCont}>
+              <Svg
+                style={styles.trailsLogoBG}
+                xmlns="http://www.w3.org/2000/svg"
+                width={275}
+                height={160}
+                viewBox="0 0 300 120"
+                fill={palette.background}
+              >
+                <Path d="M256 31.9c-1.4 2.7-1.3 14.4.2 15.9.8.8 4.7 1.2 11 1.2 8.6 0 10-.2 11.9-2.1 1.8-1.8 2.1-3 1.7-7.5-.7-8.4-2.1-9.4-13.9-9.4-8.7 0-9.9.2-10.9 1.9zM223.4 34.4c-2.7 1.4-6.3 4-8 5.7-2.6 2.7-3 3.9-3.5 11.7-.7 10.1.4 13.3 6.3 18 4.1 3.2 4 4.2-.3 4.2-3.1 0-5.2 2.4-6.3 7.3-.5 2.2-1.1 2.7-2.4 2.2-.9-.4-2.7-1-3.9-1.2-2.1-.5-2.2-1-1.8-7.7.2-3.9.3-7.8.3-8.6-.1-.8-.2-7.7-.3-15.3-.1-16.2-.1-16.2-11.1-17.2-8.1-.8-12.1.4-12.6 3.6-.4 3.2-2.3 3.4-3.6.4-1.2-2.5-1.3-2.5-9.4-2-12.2.9-12.6 1-13.3 4.8-.4 1.8-.8 14.3-.9 27.7-.2 13.5-.5 24.7-.6 25-.3.8-4.9-28-5.6-35.8-.4-3.9-1-7.2-1.4-7.2-.5 0-1.1-2.8-1.5-6.3-1.1-9.9-.9-9.7-13.3-9.7-13.7 0-17.5 1.6-18 7.6-.1 2.2-.7 6.4-1.3 9.4-.6 3-1.5 10.2-1.9 16-.5 5.8-1.5 13.4-2.3 17-1.4 6.3-1.5 6.4-1.6 2.2 0-2.4-.6-7.4-1.2-11.3-.7-4.8-.7-7.9 0-10.2 1.3-4 1.6-13 .6-18.2-.9-4.6-4.6-9.2-9.2-11.1-3.9-1.7-24.8-1.9-29-.4-1.5.6-3.4 1.8-4 2.7-1.2 1.5-1.4 1.5-3.1 0-1.6-1.4-4.7-1.7-19.2-2-13.5-.2-17.6 0-18.7 1.1-1.9 2-1.8 18.5.2 20.2.8.7 2.2.9 3.1.6 3.5-1.3 4.3 2.1 3.7 15.9-.3 7.2-.2 16.6.1 20.8.9 9.3 1.5 9.7 12.6 10.2 6.1.3 8.1.1 9.1-1.1.9-1.1 1.3-7.4 1.3-23.7l.1-22.2 3-.3c3.9-.5 5.3-1.7 5.8-5 .2-1.5.5 1.4.6 6.5 0 5.2-.3 9.4-.9 9.8-1.3.8-1.3 5.2 0 6 .6.4 1 6 1 13.4 0 9.7.3 13.1 1.4 14 1.6 1.3 13.8 3 17.2 2.3 1.4-.2 2.7-.8 3-1.3.3-.5 1.9-.2 3.5.7 3.5 1.8 12.9 1.1 16.5-1.1 1.2-.8 2.5-1 3-.5s4.8 1.2 9.6 1.6c8.5.6 8.7.6 11.1-2 2-2.1 2.6-2.4 3.6-1.2.6.7 4.4 1.8 8.4 2.4 6.2 1 8.6 1.1 13 .3.4 0 .7-.9.7-1.8 0-1.4.5-1.2 2.5 1 2.4 2.5 3.1 2.7 11.3 2.7 5.5 0 9.2-.4 10-1.2.7-.7 1.2-4.6 1.3-10.3 0-4.9.5-9.9 1-11 .6-1.4.8.1.4 4.9-.6 8.5 1.6 16.4 4.9 17.1 3.9 1 25.6-.1 26.8-1.3.6-.6 1.1-3.9 1.1-7.4 0-3.5.2-5.2.4-3.8.8 4.9 2.5 8 4.4 8 1.1 0 3.8 1.2 6.2 2.7 5.3 3.4 17.4 4.6 19.6 1.9.7-.9 1.9-1.6 2.7-1.6 2.2 0 8.2-8.3 9.4-13 .7-2.5 1.5-7 1.9-10 .7-4.9.5-6-1.7-9.5-2.7-4.2-5.5-6.8-10.6-9.8l-3.1-1.9 2.9.5c5.2.9 8.3-.9 8.9-5.1 1.3-8.2-2.4-16.7-8.6-19.8-1.7-.9-5.8-1.9-9.2-2.1-5-.4-6.8 0-11.1 2.1zM62 43.1c0 1.1-.4 1.8-1 1.4-.5-.3-.7-1.2-.3-2 .7-2.1 1.3-1.9 1.3.6zm116.7 18.6c-.2 2.7-.3.5-.3-4.7s.1-7.4.3-4.8c.2 2.7.2 6.9 0 9.5zm0 12c-.4.3-.7 0-.7-.7s.3-1 .7-.7c.3.4.3 1 0 1.4zM242.5 93c.3.5.4 1 .1 1-.3 0-.8-.5-1.1-1-.3-.6-.4-1-.1-1 .3 0 .8.4 1.1 1z" />
+              </Svg>
+              <Text style={styles.trailsLogoText}>TRAILS</Text>
+              <Text style={styles.trailsLogoMD}>MD</Text>
+            </View>
             <View style={multiselect ? styles.actionsContainer : styles.hidden}>
               <Text style={styles.selectedTitle}>{ selectCount } trails selected</Text>
               <View style={styles.flexRow}>
@@ -97,7 +115,7 @@ const TrackListScreen = () => {
             </View>
           </View>
           <View style={styles.joinView}>
-            { !loading && trails.length === 0 ? <View style={{ alignItems: 'center' }}>
+            { !loading && trails.length === 0 ? <View style={styles.joinViewBanner}>
               <Image style={styles.joinImg} source={require('../../assets/follow.png')} />
               <TouchableOpacity style={styles.joinButton} onPress={() => navigation.navigate('TrackCreate')}>
                 <Text style={styles.joinButtonText}>Start adding trails</Text>
@@ -138,13 +156,13 @@ const TrackListScreen = () => {
   </ImageBackground>;
 };
 
-const styles = StyleSheet.create({
+const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   title: {
     textAlign: 'left',
     fontWeight: '600',
     fontFamily: 'manuscript',
     fontSize: 60,
-    color: '#faeed9',
+    color: palette.background,
     textShadowColor: '#171717',
     textShadowOffset: { width: -2, height: 4 },
     textShadowRadius: 3,
@@ -153,7 +171,7 @@ const styles = StyleSheet.create({
   superscript: {
     textAlign: 'left',
     fontFamily: 'manuscript',
-    color: '#faeed9',
+    color: palette.background,
     textShadowColor: 'black',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 3,
@@ -164,7 +182,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: '85%',
     zIndex: 1000,
+  },
+  joinViewBanner: {
     paddingTop: '35%',
+    alignItems: 'center',
   },
   joinImg: {
     width: 300,
@@ -174,10 +195,10 @@ const styles = StyleSheet.create({
   joinButton: {
     width: 250,
     height: 50,
-    backgroundColor: '#113231',
+    backgroundColor: palette.text,
     borderRadius: 10,
     borderWidth: 3,
-    borderColor: '#faeed9',
+    borderColor: palette.background,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -187,10 +208,10 @@ const styles = StyleSheet.create({
     height: 30,
     marginTop: 10,
     flexDirection: 'row',
-    backgroundColor: '#113231',
+    backgroundColor: palette.text,
     borderRadius: 10,
     borderWidth: 3,
-    borderColor: '#faeed9',
+    borderColor: palette.background,
   },
   dashSectionLeft: {
     flex: 5,
@@ -204,30 +225,30 @@ const styles = StyleSheet.create({
   },
   dashIcons: {
     fontSize: 15,
-    color: '#faeed9',
+    color: palette.background,
     marginLeft: 10,
   },
   dashTitle: {
-    color: '#faeed9',
+    color: palette.background,
     fontWeight: '700',
     marginLeft: 5,
   },
   dashText: {
-    color: '#faeed9',
+    color: palette.background,
     fontWeight: '700',
     fontSize: 17,
     marginTop: -2,
     marginLeft: 5,
   },
   joinButtonText: {
-    color: '#faeed9',
+    color: palette.background,
     fontSize: 15,
     fontWeight: '700',
     marginRight: 5,
   },
   joinButtonIcon: {
     marginRight: -10,
-    color: '#faeed9',
+    color: palette.background,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -269,7 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 10,
     marginHorizontal: 5,
-    backgroundColor: '#faeed97a',
+    backgroundColor: palette.background,
     borderRadius: 10,
     height: 60,
   },
@@ -292,6 +313,29 @@ const styles = StyleSheet.create({
     bottom: 30,
     width: '85%',
     alignSelf: 'center',
+  },
+  trailsLogoCont: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    display: fontsLoaded ? 'grid' : 'none',
+  },
+  trailsLogoText: {
+    fontFamily: fontsLoaded ? 'manuscript-font' : '',
+    fontSize: 80,
+    color: palette.text,
+  },
+  trailsLogoMD: {
+    fontFamily: fontsLoaded ? 'manuscript-font' : '',
+    fontSize: 18,
+    marginTop: 6,
+    marginLeft: 2,
+    letterSpacing: 1,
+    color: palette.text,
+  },
+  trailsLogoBG: {
+    position: 'absolute',
+    top: -45,
+    left: -19,
   },
 });
 
