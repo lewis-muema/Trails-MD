@@ -93,6 +93,8 @@ const SigninScreen = () => {
         errorMessage={emailErr}
         labelStyle={styles.label}
         inputStyle={styles.inputTextSytle}
+        placeholderTextColor={palette.text}
+        inputContainerStyle={{ borderColor: palette.text }}
         autoCapitalize='none'
         autoCorrect={false}
         leftIcon={
@@ -107,6 +109,8 @@ const SigninScreen = () => {
         onChangeText={val => setPassword(val)}
         labelStyle={styles.label}
         inputStyle={styles.inputTextSytle}
+        placeholderTextColor={palette.text}
+        inputContainerStyle={{ borderColor: palette.text }}
         secureTextEntry={securePass}
         autoCapitalize='none'
         autoCorrect={false}

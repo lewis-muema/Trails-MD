@@ -138,6 +138,8 @@ const PasswordResetScreen = () => {
           errorMessage={emailErr}
           labelStyle={styles.label}
           inputStyle={styles.inputTextSytle}
+          placeholderTextColor={palette.text}
+          inputContainerStyle={{ borderColor: palette.text }}
           autoCapitalize='none'
           autoCorrect={false}
           leftIcon={
@@ -169,6 +171,8 @@ const PasswordResetScreen = () => {
           onChangeText={val => setPassword(val)}
           labelStyle={styles.label}
           inputStyle={styles.inputTextSytle}
+          placeholderTextColor={palette.text}
+          inputContainerStyle={{ borderColor: palette.text }}
           secureTextEntry={securePass}
           autoCapitalize='none'
           autoCorrect={false}
@@ -196,6 +200,8 @@ const PasswordResetScreen = () => {
           errorMessage={passErr}
           labelStyle={styles.label}
           inputStyle={styles.inputTextSytle}
+          placeholderTextColor={palette.text}
+          inputContainerStyle={{ borderColor: palette.text }}
           secureTextEntry={secureConfirm}
           autoCapitalize='none'
           autoCorrect={false}

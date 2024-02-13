@@ -4,6 +4,7 @@ import {
   Text, SafeAreaView, ImageBackground, Image, FlatList,
   TouchableOpacity, RefreshControl,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   FontAwesome, MaterialCommunityIcons, Ionicons, MaterialIcons,
 } from '@expo/vector-icons';
@@ -29,7 +30,6 @@ const TrackListScreen = () => {
     },
     fetchTracks, setMapCenter, multiSelect, clearSelect, deleteManyTracks,
   } = useContext(trackContext);
-  const { setMode } = useContext(locationContext);
   const [loading, setLoading] = useState(false);
 
   const viewTrack = (item, index) => {
@@ -49,9 +49,10 @@ const TrackListScreen = () => {
 
   useEffect(() => {
     validateAuth();
-    navigation.addListener('focus', () => {
-      setMode('create');
-      fetchTracks(val => setLoading(val));
+    navigation.addListener('focus', async () => {
+      const offline = await AsyncStorage.getItem('offline');
+      await AsyncStorage.setItem('mode', 'create');
+      fetchTracks(val => setLoading(val), offline);
     });
   }, []);
 
@@ -334,7 +335,7 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   },
   trailsLogoBG: {
     position: 'absolute',
-    top: -45,
+    top: -46,
     left: -19,
   },
 });

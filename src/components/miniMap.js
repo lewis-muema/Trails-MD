@@ -4,7 +4,7 @@ import {
   StyleSheet, View, Text,
 } from 'react-native';
 import MapView, {
-  Polyline, Marker, showCallout, hideCallout,
+  Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
 } from 'react-native-maps';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import moment from 'moment';
@@ -35,18 +35,20 @@ const MiniMap = ({ locations }) => {
   const styles = paletteStyles(palette);
 
   return <View style={locations.selected ? styles.mapContainerSelected : styles.mapContainer}>
+    <FontAwesome name="check-square" style={locations.selected ? styles.selectOverlayIcon : styles.hidden} size={24} color={palette.text} />
     <View style={locations.selected ? styles.selectOverlay : styles.hidden}>
-      <FontAwesome name="check-square" style={styles.selectOverlayIcon} size={24} color="#113231" />
     </View>
     <MapView
+      provider={PROVIDER_GOOGLE}
       style={styles.map}
       initialRegion={center()}
       region={center()}
+      customMapStyle={palette.mapstyle}
     >
       { polylines().map((polyline, index) => <Polyline
         key={index}
         strokeWidth={4}
-        strokeColor="#113231"
+        strokeColor={palette.text}
         coordinates={polyline.map(loc => loc.coords)}/>)
       }
       { polylines().map((polyline, index) => <Marker
@@ -56,7 +58,7 @@ const MiniMap = ({ locations }) => {
           onPress={showCallout}
           onDeselect={hideCallout}
         >
-          <Ionicons name="md-flag-sharp" style={styles.flag} color="green" />
+          <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsTop} />
         </Marker>)
       }
       { polylines().map((polyline, index) => <Marker
@@ -65,7 +67,7 @@ const MiniMap = ({ locations }) => {
           title={`Waypoint ${index + 1} ends here`}
           onPress={showCallout}
           onDeselect={hideCallout}>
-            <Ionicons name="md-flag-sharp" style={styles.flag} color="red" />
+            <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsBottom} />
           </Marker>)
       }
     </MapView>
@@ -108,6 +110,7 @@ const paletteStyles = palette => StyleSheet.create({
   },
   selectOverlay: {
     backgroundColor: palette.background,
+    opacity: 0.3,
     position: 'absolute',
     top: 0,
     bottom: 0,
@@ -170,9 +173,10 @@ const paletteStyles = palette => StyleSheet.create({
     display: 'none',
   },
   selectOverlayIcon: {
-    marginLeft: 'auto',
-    marginRight: 10,
-    marginTop: 10,
+    right: 10,
+    top: 10,
+    position: 'absolute',
+    zIndex: 2000,
   },
 });
 

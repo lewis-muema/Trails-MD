@@ -1,13 +1,14 @@
 /* eslint-disable no-plusplus */
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   StyleSheet, View,
 } from 'react-native';
 import MapView, {
-  Polyline, Marker, showCallout, hideCallout,
+  Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
 } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import distanceCalc from './distanceCalc';
+import { Context as PaletteContext } from '../context/paletteContext';
 
 const TrailMap = ({ locations, mapCenter }) => {
   const { centerOfMap, getPolylines } = distanceCalc();
@@ -16,6 +17,7 @@ const TrailMap = ({ locations, mapCenter }) => {
       ? centerOfMap(locations.locations, 0.01)
       : mapCenter;
   };
+  const { state: { palette } } = useContext(PaletteContext);
   const polylines = () => {
     return locations.locations ? getPolylines(locations.locations) : [];
   };
@@ -25,11 +27,13 @@ const TrailMap = ({ locations, mapCenter }) => {
       style={styles.map}
       initialRegion={center()}
       region={center()}
+      provider={PROVIDER_GOOGLE}
+      customMapStyle={palette.mapstyle}
     >
       { polylines().map((polyline, index) => <Polyline
         key={index}
         strokeWidth={4}
-        strokeColor="#113231"
+        strokeColor={palette.text}
         coordinates={polyline.map(loc => loc.coords)}/>)
       }
       { polylines().map((polyline, index) => <Marker
@@ -39,7 +43,7 @@ const TrailMap = ({ locations, mapCenter }) => {
           onPress={showCallout}
           onDeselect={hideCallout}
         >
-          <Ionicons name="md-flag-sharp" style={styles.flag} color="green" />
+          <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsTop} />
         </Marker>)
       }
       { polylines().map((polyline, index) => <Marker
@@ -48,7 +52,7 @@ const TrailMap = ({ locations, mapCenter }) => {
           title={`Waypoint ${index + 1} ends here`}
           onPress={showCallout}
           onDeselect={hideCallout}>
-            <Ionicons name="md-flag-sharp" style={styles.flag} color="red" />
+            <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsBottom} />
           </Marker>)
       }
     </MapView>

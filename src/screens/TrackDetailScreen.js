@@ -5,6 +5,7 @@ import {
   View, StyleSheet, Text, Animated, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import {
   FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, AntDesign,
@@ -28,10 +29,9 @@ const TrackDetailScreen = ({ route }) => {
   const [saveTrack, error, success, saveTrail, editTrack] = useSaveTrack();
   const {
     state: {
-      trail, mapCenter, distance, time, avgPace,
+      trail, mapCenter, distance, time, avgPace, offline,
     }, fetchOneTrack, deleteTrack,
   } = useContext(trackContext);
-  const { setMode } = useContext(locationContext);
   const { state: { palette } } = useContext(PaletteContext);
 
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
@@ -53,7 +53,7 @@ const TrackDetailScreen = ({ route }) => {
         },
         {
           text: 'Delete',
-          onPress: () => deleteTrack(val => setLoading(val), route.params.id, () => navigation.navigate('TrackList')),
+          onPress: () => deleteTrack(val => setLoading(val), route.params.id, () => navigation.navigate('TrackList'), offline),
           style: 'destructive',
         },
       ],
@@ -61,14 +61,14 @@ const TrackDetailScreen = ({ route }) => {
   };
 
   const edit = () => {
-    editTrack();
-    navigation.navigate('TrackCreate');
+    editTrack(() => navigation.navigate('TrackCreate'));
   };
 
   useEffect(() => {
-    navigation.addListener('focus', () => {
-      setMode('create');
-      fetchOneTrack(val => setLoading(val), route.params.id);
+    navigation.addListener('focus', async () => {
+      const value = await AsyncStorage.getItem('offline');
+      await AsyncStorage.setItem('mode', 'create');
+      fetchOneTrack(val => setLoading(val), route.params.id, value);
     });
   }, []);
 

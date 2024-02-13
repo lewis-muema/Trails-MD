@@ -21,6 +21,8 @@ const authReducer = (state, action) => {
       return { ...state, userId: action.payload };
     case 'clear_user':
       return { ...state, userId: '' };
+    case 'set_offline_mode':
+      return { ...state, offline: action.payload };
     default:
       return state;
   }
@@ -60,7 +62,7 @@ const signin = dispatch => ({ email, password }, loading) => {
 
 const sendResetEmail = dispatch => ({ email }, loading, stage) => {
   trails.post('/forgot-password', { email }).then((res) => {
-    dispatch({ type: 'store_user', payload: res?.data?.user });
+    dispatch({ type: 'store_user', payload: res?.data?.id });
     loading(false);
     stage(2);
     dispatch({ type: 'add_success', payload: res?.data?.message });
@@ -94,6 +96,36 @@ const validateToken = dispatch => ({ id, token, password }, loading) => {
   });
 };
 
+const deleteAccount = dispatch => (loading) => {
+  loading(true);
+  trails.delete('/delete-account').then((res) => {
+    removeData('token');
+    dispatch({ type: 'delete_token' });
+    dispatch({ type: 'add_success', payload: res?.data?.message });
+    RootNavigation.navigate('Auth', { screen: 'Signin' });
+    loading(false);
+    setTimeout(() => {
+      dispatch({ type: 'clear_success' });
+    }, 6000);
+  }).catch((err) => {
+    dispatch({ type: 'add_error', payload: err?.response?.data?.message });
+    setTimeout(() => {
+      dispatch({ type: 'clear_error' });
+    }, 3000);
+    loading(false);
+  });
+};
+
+const offlineMode = dispatch => async (mode, setVals) => {
+  dispatch({ type: 'set_offline_mode', payload: mode });
+  setVals();
+  if (mode) {
+    await AsyncStorage.setItem('offline', mode);
+  } else {
+    await AsyncStorage.removeItem('offline');
+  }
+};
+
 const signout = dispatch => () => {
   removeData('token');
   dispatch({ type: 'delete_token' });
@@ -121,9 +153,18 @@ const validateAuth = dispatch => async () => {
 export const { Provider, Context } = createDataContect(
   authReducer,
   {
-    signin, signup, signout, clearErrors, setError, validateAuth, sendResetEmail, validateToken,
+    signin,
+    signup,
+    signout,
+    clearErrors,
+    setError,
+    validateAuth,
+    sendResetEmail,
+    validateToken,
+    deleteAccount,
+    offlineMode,
   },
   {
-    token: null, errorMessage: '', successMessage: '', userId: '',
+    token: null, errorMessage: '', successMessage: '', userId: '', offline: '',
   },
 );

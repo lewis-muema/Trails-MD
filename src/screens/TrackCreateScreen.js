@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import { useIsFocused, useNavigation, CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import Map from '../components/map';
 import Banner from '../components/banner';
@@ -19,12 +20,12 @@ import Metrics from '../components/metrics';
 
 const nameRef = React.createRef();
 
-const TrackCreateScreen = () => {
+const TrackCreateScreen = ({ route }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const {
     state: {
-      name, recording, locations, trackStatus, savedStatus, mode,
+      name, recording, locations, trackStatus, savedStatus,
     },
     addLocation,
     startRecording,
@@ -33,7 +34,7 @@ const TrackCreateScreen = () => {
     reset,
   } = useContext(locationContext);
   const { state: { palette } } = useContext(PaletteContext);
-  const { state: { trail }, setMapCenter } = useContext(trackContext);
+  const { state: { trail, offline }, setMapCenter, setOffline } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,10 +72,13 @@ const TrackCreateScreen = () => {
   };
 
   useEffect(() => {
-    navigation.addListener('focus', () => {
+    navigation.addListener('focus', async () => {
+      const val = await AsyncStorage.getItem('offline');
+      const mode = await AsyncStorage.getItem('mode');
       if (mode === 'create') {
         reset();
       }
+      setOffline(val);
     });
   }, []);
 
@@ -91,7 +95,7 @@ const TrackCreateScreen = () => {
           !recording && locations.length && savedStatus
             ? <TouchableOpacity style={{ zIndex: 1000 }} onPress={() => reset()}>
                 <View style={styles.addTrail}>
-                  <Ionicons name="add-circle-sharp" size={16} color="#b6541c" />
+                  <Ionicons name="add-circle-sharp" size={16} color={palette.metricsTop} />
                   <Text style={styles.addTrailText}>Add New Trail</Text>
                 </View>
               </TouchableOpacity>
@@ -109,6 +113,8 @@ const TrackCreateScreen = () => {
           }
           labelStyle={styles.label}
           inputStyle={styles.inputTextSytle}
+          placeholderTextColor={palette.text}
+          inputContainerStyle={{ borderColor: palette.text }}
           autoCorrect={false}
           errorMessage={error}
           leftIcon={
@@ -130,7 +136,7 @@ const TrackCreateScreen = () => {
               buttonStyle={styles.saveButton}
               disabledStyle={styles.saveButton}
               titleStyle={styles.createTrackButtonText}
-              onPress={() => saveTrack(val => setLoading(val))}
+              onPress={() => saveTrack(val => setLoading(val), offline)}
               loading={loading}
               disabled={loading}
             /> : null}

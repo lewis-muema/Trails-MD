@@ -13,9 +13,9 @@ import PasswordResetScreen from './src/screens/PasswordReset';
 import TrackCreateScreen from './src/screens/TrackCreateScreen';
 import TrackDetailScreen from './src/screens/TrackDetailScreen';
 import TrackListScreen from './src/screens/TrackListScreen';
-import { Provider as AuthProvider } from './src/context/AuthContext';
+import { Provider as AuthProvider, Context as AuthContext } from './src/context/AuthContext';
 import { Provider as LocationProvider } from './src/context/locationContext';
-import { Provider as TrackProvider } from './src/context/trackContext';
+import { Provider as TrackProvider, Context as trackContext } from './src/context/trackContext';
 import { Provider as PaletteProvider, Context as PaletteContext } from './src/context/paletteContext';
 import { navigationRef } from './src/RootNavigation';
 
@@ -77,10 +77,12 @@ function Auth() {
 }
 
 function App() {
+  const { offlineMode } = useContext(AuthContext);
   const { changeBG, changeTheme, fontsLoadedStatus } = useContext(PaletteContext);
   const loadTheme = async () => {
     SplashScreen.preventAutoHideAsync().catch(() => {});
     try {
+      const offline = await AsyncStorage.getItem('offline');
       const theme = await AsyncStorage.getItem('theme');
       const bg = await AsyncStorage.getItem('bg');
       if (theme !== null) {
@@ -89,18 +91,24 @@ function App() {
       if (bg !== null) {
         changeBG(JSON.parse(bg));
       }
+      if (offline) {
+        offlineMode('offline', () => {});
+      }
       await Font.loadAsync({
         'manuscript-font': require('./assets/fonts/Manuscript.ttf'),
       });
       fontsLoadedStatus(true);
-      await SplashScreen.hideAsync();
     } catch (e) {
       // error reading value
+    } finally {
+      await SplashScreen.hideAsync();
     }
   };
+
   useEffect(() => {
     loadTheme();
   }, []);
+
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName="Home" screenOptions={{

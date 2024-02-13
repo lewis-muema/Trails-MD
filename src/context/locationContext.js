@@ -19,8 +19,6 @@ const locationReducer = (state, action) => {
       return { ...state, polylines: createLocs(state) };
     case 'set_locations':
       return { ...state, locations: action.payload };
-    case 'set_mode':
-      return { ...state, mode: action.payload };
     case 'set_index':
       return { ...state, index: action.payload };
     case 'change_name':
@@ -121,10 +119,6 @@ const setLocations = dispatch => (name, locations, index) => {
   dispatch({ type: 'change_name', payload: name });
 };
 
-const setMode = dispatch => (mode) => {
-  dispatch({ type: 'set_mode', payload: mode });
-};
-
 
 export const { Context, Provider } = createDataContext(
   locationReducer,
@@ -137,7 +131,6 @@ export const { Context, Provider } = createDataContext(
     changeSavedStatus,
     setLocations,
     reset,
-    setMode,
   },
   {
     recording: false,
@@ -149,6 +142,5 @@ export const { Context, Provider } = createDataContext(
     distance: 0,
     trackStatus: 'Start Tracking',
     savedStatus: false,
-    mode: 'create',
   },
 );
