@@ -34,10 +34,11 @@ const TrackCreateScreen = ({ route }) => {
     reset,
   } = useContext(locationContext);
   const { state: { palette } } = useContext(PaletteContext);
-  const { state: { trail, offline }, setMapCenter, setOffline } = useContext(trackContext);
+  const { state: { trail }, setMapCenter } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [offline, setOffline] = useState('');
   // useCallback maintains the state of the function sent
   // to the watcher to prevent it from sending a new callback every time react rerenders.
   const callback = useCallback(location => addLocation(location, recording), [recording]);

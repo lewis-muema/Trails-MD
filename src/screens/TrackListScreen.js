@@ -31,6 +31,7 @@ const TrackListScreen = () => {
     fetchTracks, setMapCenter, multiSelect, clearSelect, deleteManyTracks,
   } = useContext(trackContext);
   const [loading, setLoading] = useState(false);
+  const [offline, setOffline] = useState('');
 
   const viewTrack = (item, index) => {
     if (multiselect) {
@@ -50,9 +51,10 @@ const TrackListScreen = () => {
   useEffect(() => {
     validateAuth();
     navigation.addListener('focus', async () => {
-      const offline = await AsyncStorage.getItem('offline');
+      const value = await AsyncStorage.getItem('offline');
+      setOffline(value);
       await AsyncStorage.setItem('mode', 'create');
-      fetchTracks(val => setLoading(val), offline);
+      fetchTracks(val => setLoading(val), value);
     });
   }, []);
 
@@ -85,14 +87,14 @@ const TrackListScreen = () => {
               <Text style={styles.selectedTitle}>{ selectCount } trails selected</Text>
               <View style={styles.flexRow}>
                 <View style={styles.actionsRow}>
-                  <TouchableOpacity onPress={() => clearSelect(trails)}>
+                  <TouchableOpacity onPress={() => clearSelect(trails, offline)}>
                     <MaterialIcons name="clear-all" style={styles.actionIcons} size={24} color="black" />
                     <Text style={styles.actionTitles}>Clear</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.actionsRow}>
                   <TouchableOpacity
-                    onPress={() => deleteManyTracks(val => setLoading(val), trails)}
+                    onPress={() => deleteManyTracks(val => setLoading(val), trails, offline)}
                   >
                     <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
                     <Text style={styles.actionTitles}>Delete</Text>

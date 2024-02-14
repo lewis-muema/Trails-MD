@@ -39,8 +39,6 @@ const trackReducer = (state, action) => {
       return { ...state, ...removeDataOffline(state) };
     case 'set_state':
       return { ...state, ...action.payload };
-    case 'set_offline':
-      return { ...state, offline: action.payload };
     default:
       return state;
   }
@@ -63,7 +61,6 @@ const multiSelect = dispatch => (trls, index, count) => {
   } else {
     trls[index].selected = true;
   }
-  dispatch({ type: 'store_trail', payload: trls });
   dispatch({
     type: 'set_multiselect',
     payload: {
@@ -72,11 +69,24 @@ const multiSelect = dispatch => (trls, index, count) => {
   });
 };
 
-const clearSelect = dispatch => (trls) => {
+const clearSelect = dispatch => (trls, offline) => {
   trls.forEach((trl) => {
     delete trl.selected;
   });
-  dispatch({ type: 'store_trail', payload: trls });
+  if (offline) {
+    AsyncStorage.getItem('trail_state').then(async (value) => {
+      let trlz = JSON.parse(value);
+      trlz = {
+        ...trlz,
+        trails: trls,
+        multiselect: false,
+        selectCount: 0,
+        trail: {},
+        distance: totalDistance(trls),
+      };
+      await AsyncStorage.setItem('trail_state', JSON.stringify(trlz));
+    });
+  }
   dispatch({ type: 'set_multiselect', payload: { val: false, count: 0 } });
 };
 
@@ -113,22 +123,17 @@ const setMapCenter = dispatch => (locations) => {
   dispatch({ type: 'set_map_center', payload: centerOfMap(locations.locations, 0.01) });
 };
 
-const setOffline = dispatch => (offline) => {
-  dispatch({ type: 'set_offline', payload: offline });
-};
-
 const fetchTracks = dispatch => (loading, offline) => {
   loading(true);
   if (offline) {
-    dispatch({ type: 'set_offline', payload: offline });
     AsyncStorage.getItem('trail_state').then((value) => {
       if (value !== null) {
         dispatch({ type: 'set_state', payload: JSON.parse(value) });
+        dispatch({ type: 'total_distance', payload: totalDistance(JSON.parse(value).trails) });
       }
       loading(false);
     });
   } else {
-    dispatch({ type: 'set_offline', payload: offline });
     trails.get('/tracks').then((res) => {
       loading(false);
       dispatch({ type: 'fetch_trails', payload: res?.data?.tracks.reverse() });
@@ -142,7 +147,6 @@ const fetchTracks = dispatch => (loading, offline) => {
 const fetchOneTrack = dispatch => (loading, id, offline) => {
   loading(true);
   if (offline) {
-    dispatch({ type: 'set_offline', payload: offline });
     dispatch({ type: 'store_trail', payload: {} });
     AsyncStorage.getItem('trail_state').then((value) => {
       if (value !== null) {
@@ -155,7 +159,6 @@ const fetchOneTrack = dispatch => (loading, id, offline) => {
       }
     });
   } else {
-    dispatch({ type: 'set_offline', payload: offline });
     dispatch({ type: 'store_trail', payload: {} });
     trails.get(`/tracks/${id}`).then((res) => {
       loading(false);
@@ -175,7 +178,6 @@ const editSavedTrack = dispatch => (
 ) => {
   loading(true);
   if (offline) {
-    dispatch({ type: 'set_offline', payload: offline });
     dispatch({ type: 'delete_error' });
     AsyncStorage.getItem('trail_state').then(async (value) => {
       if (value !== null) {
@@ -197,7 +199,6 @@ const editSavedTrack = dispatch => (
       }
     });
   } else {
-    dispatch({ type: 'set_offline', payload: offline });
     dispatch({ type: 'delete_error' });
     dispatch({ type: 'store_trail', payload: {} });
     trails.put(`/tracks/${id}`, { name, locations }).then((res) => {
@@ -259,33 +260,68 @@ const deleteTrack = dispatch => (loading, id, navigateToList, offline) => {
   }
 };
 
-const deleteManyTracks = dispatch => (loading, trls) => {
+const deleteManyTracks = dispatch => (loading, trls, offline) => {
   loading(true);
-  const ids = trls.filter(trl => trl.selected === true).map(({ id }) => id);
-  trails.post('/delete-tracks', ids).then((response) => {
-    trails.get('/tracks').then((res) => {
-      loading(false);
-      dispatch({ type: 'add_success', payload: response?.data.message });
-      setTimeout(() => {
-        dispatch({ type: 'delete_success' });
-      }, 5000);
-      dispatch({ type: 'set_multiselect', payload: { val: false, count: 0 } });
-      dispatch({ type: 'fetch_trails', payload: res?.data?.tracks.reverse() });
-      dispatch({ type: 'total_distance', payload: totalDistance(res?.data?.tracks) });
-    }).catch(() => {
-      loading(false);
-      dispatch({ type: 'fetch_trails', payload: [] });
+  if (offline) {
+    AsyncStorage.getItem('trail_state').then(async (value) => {
+      if (value !== null) {
+        const trlz = JSON.parse(value);
+        const deletedTrails = trls.filter(trl => trl.selected === true);
+        const deletedTrailIds = deletedTrails.map(trl => trl.id);
+        const remainingTrails = trlz.trails.filter(trl => !deletedTrailIds.includes(trl.id));
+        AsyncStorage.getItem('deleted_trails_state').then(async (trail) => {
+          if (trail === null) {
+            await AsyncStorage.setItem('deleted_trails_state', JSON.stringify(deletedTrails));
+          } else {
+            const parsedTrail = JSON.parse(trail);
+            parsedTrail.push(...deletedTrails);
+            await AsyncStorage.setItem('deleted_trails_state', JSON.stringify(parsedTrail));
+          }
+        });
+        dispatch({ type: 'add_success', payload: 'Trail deleted successfully' });
+        dispatch({ type: 'set_multiselect', payload: { val: false, count: 0 } });
+        const newState = {
+          ...trlz,
+          multiselect: false,
+          selectCount: 0,
+          trail: {},
+          distance: totalDistance(remainingTrails),
+          trails: remainingTrails,
+        };
+        dispatch({ type: 'set_state', payload: newState });
+        await AsyncStorage.setItem('trail_state', JSON.stringify(newState));
+        setTimeout(() => {
+          dispatch({ type: 'delete_success' });
+        }, 5000);
+        loading(false);
+      }
     });
-  }).catch((err) => {
-    loading(false);
-    dispatch({ type: 'add_error', payload: err?.response?.data?.message });
-  });
+  } else {
+    const ids = trls.filter(trl => trl.selected === true).map(({ id }) => id);
+    trails.post('/delete-tracks', ids).then((response) => {
+      trails.get('/tracks').then((res) => {
+        loading(false);
+        dispatch({ type: 'add_success', payload: response?.data.message });
+        setTimeout(() => {
+          dispatch({ type: 'delete_success' });
+        }, 5000);
+        dispatch({ type: 'set_multiselect', payload: { val: false, count: 0 } });
+        dispatch({ type: 'fetch_trails', payload: res?.data?.tracks.reverse() });
+        dispatch({ type: 'total_distance', payload: totalDistance(res?.data?.tracks) });
+      }).catch(() => {
+        loading(false);
+        dispatch({ type: 'fetch_trails', payload: [] });
+      });
+    }).catch((err) => {
+      loading(false);
+      dispatch({ type: 'add_error', payload: err?.response?.data?.message });
+    });
+  }
 };
 
 const createTrack = dispatch => (name, locations, loading, changeSavedStatus, offline) => {
   loading(true);
   if (offline) {
-    dispatch({ type: 'set_offline', payload: offline });
     dispatch({ type: 'delete_error' });
     AsyncStorage.getItem('trail_state').then(async (value) => {
       if (value !== null) {
@@ -305,7 +341,6 @@ const createTrack = dispatch => (name, locations, loading, changeSavedStatus, of
       }
     });
   } else {
-    dispatch({ type: 'set_offline', payload: offline });
     dispatch({ type: 'delete_error' });
     dispatch({ type: 'store_trail', payload: {} });
     trails.post('/tracks', { name, locations }).then((res) => {
@@ -366,7 +401,6 @@ export const { Provider, Context } = createDataContext(
     clearSelect,
     resetTrails,
     saveTrailsOffline,
-    setOffline,
   },
   {
     trail: {},
@@ -379,6 +413,5 @@ export const { Provider, Context } = createDataContext(
     avgPace: 0,
     multiselect: false,
     selectCount: 0,
-    offline: '',
   },
 );

@@ -14,12 +14,14 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as PaletteContext } from '../context/paletteContext';
 
 const AccountScreen = () => {
+  const navigation = useNavigation();
   const {
     state: { offline },
     signout, deleteAccount, offlineMode,
@@ -76,8 +78,12 @@ const AccountScreen = () => {
   const styles = paletteStyles(palette);
 
   useEffect(() => {
-    getData('email');
-    useImageColors();
+    navigation.addListener('focus', async () => {
+      getData('email');
+      useImageColors();
+      const value = await AsyncStorage.getItem('offline');
+      offlineMode(value, () => {});
+    });
   }, []);
 
   return <ImageBackground source={background.image} resizeMode="cover" style={styles.bg}>
