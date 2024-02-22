@@ -26,10 +26,11 @@ const TrackDetailScreen = ({ route }) => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('Loading');
+  const [offline, setOffline] = useState('');
   const [saveTrack, error, success, saveTrail, editTrack] = useSaveTrack();
   const {
     state: {
-      trail, mapCenter, distance, time, avgPace, offline,
+      trail, mapCenter, distance, time, avgPace,
     }, fetchOneTrack, deleteTrack,
   } = useContext(trackContext);
   const { state: { palette } } = useContext(PaletteContext);
@@ -67,6 +68,7 @@ const TrackDetailScreen = ({ route }) => {
   useEffect(() => {
     navigation.addListener('focus', async () => {
       const value = await AsyncStorage.getItem('offline');
+      setOffline(value);
       await AsyncStorage.setItem('mode', 'create');
       fetchOneTrack(val => setLoading(val), route.params.id, value);
     });

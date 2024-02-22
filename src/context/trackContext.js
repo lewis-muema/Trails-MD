@@ -35,8 +35,6 @@ const trackReducer = (state, action) => {
       return { ...state, ...action.payload };
     case 'save_trails_offline':
       return { ...state, ...storeDataOffline('trail_state', state) };
-    case 'remove_trails_offline':
-      return { ...state, ...removeDataOffline(state) };
     case 'set_state':
       return { ...state, ...action.payload };
     default:
@@ -46,12 +44,6 @@ const trackReducer = (state, action) => {
 
 const storeDataOffline = async (key, value) => {
   await AsyncStorage.setItem(key, JSON.stringify(value));
-  return value;
-};
-
-const removeDataOffline = async (value) => {
-  await AsyncStorage.removeItem('trail_state');
-  await AsyncStorage.removeItem('deleted_trails_state');
   return value;
 };
 
@@ -361,11 +353,81 @@ const createTrack = dispatch => (name, locations, loading, changeSavedStatus, of
   }
 };
 
-const saveTrailsOffline = dispatch => async (mode) => {
+const syncOfflineTrails = (data) => {
+  const offlineTrails = [];
+  data.trails.forEach((trail) => {
+    if (trail.action) {
+      offlineTrails.push(trail);
+    }
+  });
+  return new Promise((resolve) => {
+    trails.post('/tracks/many', { tracks: offlineTrails }).then(async (res) => {
+      await AsyncStorage.removeItem('trail_state');
+      trails.get('/tracks').then((res2) => {
+        resolve({
+          error: '',
+          success: res?.data.message,
+          distance: totalDistance(res2?.data?.tracks.reverse()),
+          trails: res2?.data?.tracks,
+        });
+      }).catch((err2) => {
+        resolve({
+          error: err2?.response?.data?.message,
+          success: '',
+          distance: 0,
+          trails: [],
+        });
+      });
+    }).catch((err) => {
+      resolve({
+        error: err?.response?.data?.message,
+        success: '',
+        distance: 0,
+        trails: [],
+      });
+    });
+  });
+};
+
+const deleteOfflineTrails = (data) => {
+  if (data) {
+    const ids = data.filter(trl => !trl.id.includes('offline_Trails')).map(({ id }) => id);
+    trails.post('/delete-tracks', ids).then(async () => {
+      await AsyncStorage.removeItem('deleted_trails_state');
+    }).catch(() => {});
+  }
+};
+
+const saveTrailsOffline = dispatch => (mode, setMode, loading) => {
+  loading(true);
   if (mode) {
     dispatch({ type: 'save_trails_offline' });
+    setMode();
+    loading(false);
   } else {
-    dispatch({ type: 'remove_trails_offline' });
+    AsyncStorage.getItem('trail_state').then(async (data) => {
+      syncOfflineTrails(JSON.parse(data)).then((syncData) => {
+        if (syncData?.success) {
+          setMode();
+          loading(false);
+          dispatch({ type: 'add_success', payload: syncData?.success });
+          setTimeout(() => {
+            dispatch({ type: 'delete_success' });
+          }, 5000);
+          dispatch({ type: 'fetch_trails', payload: syncData?.trails });
+          dispatch({ type: 'total_distance', payload: totalDistance(syncData?.trails) });
+        } else if (syncData?.error) {
+          loading(false);
+          dispatch({ type: 'add_error', payload: syncData?.error });
+          setTimeout(() => {
+            dispatch({ type: 'delete_error' });
+          }, 5000);
+        }
+      });
+    });
+    AsyncStorage.getItem('deleted_trails_state').then((deleteData) => {
+      deleteOfflineTrails(JSON.parse(deleteData));
+    });
   }
 };
 

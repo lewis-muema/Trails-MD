@@ -116,9 +116,8 @@ const deleteAccount = dispatch => (loading) => {
   });
 };
 
-const offlineMode = dispatch => async (mode, setVals) => {
+const offlineMode = dispatch => async (mode) => {
   dispatch({ type: 'set_offline_mode', payload: mode });
-  setVals();
   if (mode) {
     await AsyncStorage.setItem('offline', mode);
   } else {

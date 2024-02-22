@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as PaletteContext } from '../context/paletteContext';
+import Banner from '../components/banner';
 
 const AccountScreen = () => {
   const navigation = useNavigation();
@@ -27,10 +28,14 @@ const AccountScreen = () => {
     signout, deleteAccount, offlineMode,
   } = useContext(AuthContext);
   const {
+    state: {
+      success, error,
+    },
     saveTrailsOffline,
   } = useContext(trackContext);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [offlineLoading, setOfflineLoading] = useState(false);
   const {
     state:
     {
@@ -72,7 +77,7 @@ const AccountScreen = () => {
   };
 
   const setOfflineMode = () => {
-    offlineMode(offline ? '' : 'offline', () => saveTrailsOffline(offline ? '' : 'offline'));
+    saveTrailsOffline(offline ? '' : 'offline', () => offlineMode(offline ? '' : 'offline'), off => setOfflineLoading(off));
   };
 
   const styles = paletteStyles(palette);
@@ -109,11 +114,17 @@ const AccountScreen = () => {
                 (This mode allows you to record and save trails with data/wifi turned off.)
                 </Text>
             </View>
-            <TouchableOpacity
-              style={offline ? styles.onlineButton : styles.offlineButton}
-              onPress={() => setOfflineMode()}>
-              <Text style={styles.offlineButtonText}>{ offline ? 'Go online' : 'Go Offline'}</Text>
-            </TouchableOpacity>
+            <View style={styles.deleteButtonCont}>
+              <Button
+                title={ offline ? 'Go online' : 'Go Offline'}
+                buttonStyle={offline ? styles.onlineButton : styles.offlineButton}
+                disabledStyle={offline ? styles.onlineButton : styles.offlineButton}
+                titleStyle={styles.deleteButtonText}
+                onPress={() => setOfflineMode()}
+                loading={offlineLoading}
+                disabled={offlineLoading}
+              />
+            </View>
           </View>
           <View style={styles.signOut}>
             <View style={styles.offlineMode}>
@@ -199,6 +210,14 @@ const AccountScreen = () => {
         </View>
       </View>
     </SafeAreaView>
+    { error ? <View style={styles.error}>
+      <Banner message={error} type='error'></Banner>
+      </View> : null
+    }
+    { success ? <View style={styles.error}>
+      <Banner message={success} type='success'></Banner>
+      </View> : null
+    }
    </ImageBackground>;
 };
 
@@ -257,25 +276,21 @@ const paletteStyles = palette => StyleSheet.create({
     borderWidth: 2,
     borderColor: 'grey',
     backgroundColor: 'grey',
-    padding: 10,
     borderRadius: 20,
-    marginLeft: 'auto',
-    marginRight: 10,
     marginVertical: 5,
     height: 40,
-    alignSelf: 'center',
+    alignSelf: 'flex-end',
+    width: 100,
   },
   onlineButton: {
     borderWidth: 2,
     borderColor: 'green',
     backgroundColor: 'green',
-    padding: 10,
     borderRadius: 20,
-    marginLeft: 'auto',
-    marginRight: 10,
     marginVertical: 5,
     height: 40,
-    alignSelf: 'center',
+    alignSelf: 'flex-end',
+    width: 100,
   },
   offlineButtonText: {
     fontWeight: '600',
@@ -368,6 +383,13 @@ const paletteStyles = palette => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#00000047',
+  },
+  error: {
+    marginHorizontal: 30,
+    position: 'absolute',
+    bottom: 30,
+    width: '85%',
+    alignSelf: 'center',
   },
 });
 
