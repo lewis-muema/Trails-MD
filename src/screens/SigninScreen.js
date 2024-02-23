@@ -8,6 +8,7 @@ import {
 } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spacer from '../components/Spacer';
 import Banner from '../components/banner';
 import Loader from '../components/loader';
@@ -27,9 +28,9 @@ const SigninScreen = () => {
   const [emailErr, setEmailErr] = useState('');
   const [loading, setLoading] = useState(false);
   const {
-    state, signin, clearErrors, validateAuth,
+    state, signin, clearErrors, validateAuth, offlineMode,
   } = useContext(AuthContext);
-  const { resetTrails } = useContext(trackContext);
+  const { resetTrails, saveTrailsOffline } = useContext(trackContext);
   const { reset } = useContext(locationContext);
   const { state: { palette, fontsLoaded } } = useContext(PaletteContext);
 
@@ -50,6 +51,15 @@ const SigninScreen = () => {
       setLoading(true);
       signin({ email, password }, val => setLoading(val));
     }
+  };
+
+  const setOfflineMode = async () => {
+    const guest = await AsyncStorage.getItem('guest');
+    if (!guest) {
+      await AsyncStorage.setItem('guest', 'yes');
+      saveTrailsOffline('offline', () => offlineMode('offline'), () => {});
+    }
+    navigation.navigate('Home', { screen: 'Tracks' });
   };
 
   useEffect(() => {
@@ -130,7 +140,7 @@ const SigninScreen = () => {
       </View>
       { state.errorMessage ? <Spacer>
         <Banner message={state.errorMessage} type='error'></Banner>
-        </Spacer> : <Spacer />
+        </Spacer> : null
       }
       <Spacer>
         <View style={styles.signupButtonContainer}>
@@ -144,6 +154,16 @@ const SigninScreen = () => {
         </View>
       </Spacer>
       <Spacer>
+        <View style={styles.signupButtonContainer}>
+          <Button
+            title='Continue as Guest'
+            buttonStyle={styles.guestButton}
+            titleStyle={styles.signupButtonText}
+            loading={loading}
+            onPress={() => setOfflineMode()}
+          />
+        </View>
+      </Spacer>
         <TouchableOpacity style={styles.signinText} onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.signin}>Don't have an account?  </Text>
           <Text style={{ ...styles.signin, textDecorationLine: 'underline' }}>Sign up here</Text>
@@ -151,7 +171,6 @@ const SigninScreen = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Passwordreset')}>
           <Text style={styles.reset}>Forgot password? Reset it here</Text>
         </TouchableOpacity>
-      </Spacer>
       <Spacer />
       <Spacer />
     </View>;
@@ -206,6 +225,12 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   },
   signupButton: {
     backgroundColor: palette.text,
+    borderRadius: 10,
+    width: '100%',
+    fontSize: 14,
+  },
+  guestButton: {
+    backgroundColor: palette.metricsBottom,
     borderRadius: 10,
     width: '100%',
     fontSize: 14,

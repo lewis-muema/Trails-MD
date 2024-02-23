@@ -8,11 +8,13 @@ import {
 } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spacer from '../components/Spacer';
 import Banner from '../components/banner';
 import Loader from '../components/loader';
 import { Context as AuthContext } from '../context/AuthContext';
 import { Context as PaletteContext } from '../context/paletteContext';
+import { Context as trackContext } from '../context/trackContext';
 
 const emailRef = React.createRef();
 const passRef = React.createRef();
@@ -28,8 +30,9 @@ const SignupScreen = () => {
   const [passErr, setPassErr] = useState('');
   const [loading, setLoading] = useState(false);
   const {
-    state, signup, clearErrors, validateAuth,
+    state, signup, clearErrors, validateAuth, offlineMode,
   } = useContext(AuthContext);
+  const { saveTrailsOffline } = useContext(trackContext);
   const { state: { palette, fontsLoaded } } = useContext(PaletteContext);
 
   const emailValidator = () => {
@@ -58,8 +61,17 @@ const SignupScreen = () => {
       passwordValidator();
     } else {
       setLoading(true);
-      signup({ email, password }, val => setLoading(val));
+      signup({ email, password }, val => setLoading(val), () => saveTrailsOffline('', () => offlineMode(''), () => {}));
     }
+  };
+
+  const setOfflineMode = async () => {
+    const guest = await AsyncStorage.getItem('guest');
+    if (!guest) {
+      await AsyncStorage.setItem('guest', 'yes');
+      saveTrailsOffline('offline', () => offlineMode('offline'), () => {});
+    }
+    navigation.navigate('Home', { screen: 'Tracks' });
   };
 
   useEffect(() => {
@@ -168,7 +180,7 @@ const SignupScreen = () => {
       </View>
       { state.errorMessage ? <Spacer>
         <Banner message={state.errorMessage} type='error'></Banner>
-        </Spacer> : <Spacer />
+        </Spacer> : null
       }
       <Spacer>
         <View style={styles.signupButtonContainer}>
@@ -178,6 +190,17 @@ const SignupScreen = () => {
             titleStyle={styles.signupButtonText}
             loading={loading}
             onPress={() => signupCTA()}
+          />
+        </View>
+      </Spacer>
+      <Spacer>
+        <View style={styles.signupButtonContainer}>
+          <Button
+            title='Continue as Guest'
+            buttonStyle={styles.guestButton}
+            titleStyle={styles.signupButtonText}
+            loading={loading}
+            onPress={() => setOfflineMode()}
           />
         </View>
       </Spacer>
@@ -226,6 +249,12 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   },
   signupButton: {
     backgroundColor: palette.text,
+    borderRadius: 10,
+    width: '100%',
+    fontSize: 14,
+  },
+  guestButton: {
+    backgroundColor: palette.metricsBottom,
     borderRadius: 10,
     width: '100%',
     fontSize: 14,

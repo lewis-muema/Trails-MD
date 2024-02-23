@@ -35,10 +35,16 @@ const removeData = async (key) => {
   await AsyncStorage.removeItem(key);
 };
 
-const signup = dispatch => ({ email, password }, loading) => {
-  trails.post('/signup', { email, password }).then((res) => {
+const signup = dispatch => ({ email, password }, loading, saveOfflineData) => {
+  trails.post('/signup', { email, password }).then(async (res) => {
     storeData('token', res?.data?.token);
+    storeData('email', email);
     dispatch({ type: 'add_token', payload: res?.data?.token });
+    const guest = await AsyncStorage.getItem('guest');
+    if (guest === 'yes') {
+      await AsyncStorage.removeItem('guest');
+      saveOfflineData();
+    }
     loading(false);
     RootNavigation.navigate('Home', { screen: 'Tracks' });
   }).catch((err) => {
@@ -141,8 +147,11 @@ const clearErrors = dispatch => () => {
 
 const validateAuth = dispatch => async () => {
   const value = await AsyncStorage.getItem('token');
+  const guest = await AsyncStorage.getItem('guest');
   if (value !== null) {
     dispatch({ type: 'add_token', payload: value });
+    RootNavigation.navigate('Home', { screen: 'Tracks' });
+  } else if (guest === 'yes') {
     RootNavigation.navigate('Home', { screen: 'Tracks' });
   } else {
     RootNavigation.navigate('Auth', { screen: 'Signin' });

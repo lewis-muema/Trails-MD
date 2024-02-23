@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import {
   View, StyleSheet,
   Text, SafeAreaView, ImageBackground, Image, FlatList,
-  TouchableOpacity, RefreshControl,
+  TouchableOpacity, RefreshControl, Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -48,6 +48,24 @@ const TrackListScreen = () => {
     }
   };
 
+  const confirmDelete = () => {
+    Alert.alert(
+      `Delete ${selectCount} trails`,
+      `This action is irresverible. Are you sure you want to delete these ${selectCount} trails?`, [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => deleteManyTracks(val => setLoading(val), trails, offline),
+          style: 'destructive',
+        },
+      ],
+    );
+  };
+
   useEffect(() => {
     validateAuth();
     navigation.addListener('focus', async () => {
@@ -61,7 +79,7 @@ const TrackListScreen = () => {
   const styles = paletteStyles(palette, fontsLoaded);
 
   const onRefresh = () => {
-    fetchTracks(val => setLoading(val));
+    fetchTracks(val => setLoading(val), offline);
   };
 
   return <ImageBackground source={background.image} resizeMode="cover" style={styles.bg}>
@@ -94,7 +112,7 @@ const TrackListScreen = () => {
                 </View>
                 <View style={styles.actionsRow}>
                   <TouchableOpacity
-                    onPress={() => deleteManyTracks(val => setLoading(val), trails, offline)}
+                    onPress={() => confirmDelete()}
                   >
                     <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
                     <Text style={styles.actionTitles}>Delete</Text>

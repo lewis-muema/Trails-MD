@@ -20,6 +20,7 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as PaletteContext } from '../context/paletteContext';
 import Banner from '../components/banner';
+import Spacer from '../components/Spacer';
 
 const AccountScreen = () => {
   const navigation = useNavigation();
@@ -34,6 +35,7 @@ const AccountScreen = () => {
     saveTrailsOffline,
   } = useContext(trackContext);
   const [email, setEmail] = useState('');
+  const [guestMode, setGuestMode] = useState('');
   const [loading, setLoading] = useState(false);
   const [offlineLoading, setOfflineLoading] = useState(false);
   const {
@@ -56,6 +58,10 @@ const AccountScreen = () => {
     } catch (e) {
       // error reading value
     }
+  };
+
+  const signup = () => {
+    navigation.navigate('Auth', { screen: 'Signup' });
   };
 
   const confirmDelete = () => {
@@ -87,6 +93,8 @@ const AccountScreen = () => {
       getData('email');
       useImageColors();
       const value = await AsyncStorage.getItem('offline');
+      const guest = await AsyncStorage.getItem('guest');
+      setGuestMode(guest);
       offlineMode(value, () => {});
     });
   }, []);
@@ -98,54 +106,78 @@ const AccountScreen = () => {
         <View style={styles.account}>
           <View style={styles.signOut}>
             <View style={styles.offlineMode}>
-              <Text style={styles.offlineModeTop}>{ email }</Text>
+              <Text style={styles.offlineModeTop}>{ guestMode === 'yes' ? 'Guest' : email }</Text>
               <Text style={styles.offlineModeTitle}>
-                You are signed in to:
-                </Text>
-            </View>
-            <TouchableOpacity style={styles.signOutButton} onPress={() => signout()}>
-              <Text style={styles.signOutButtonText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.signOut}>
-            <View style={styles.offlineMode}>
-              <Text style={styles.offlineModeTop}>Offline mode</Text>
-              <Text style={styles.offlineModeTitle}>
-                (This mode allows you to record and save trails with data/wifi turned off.)
-                </Text>
+                You are signed in as:
+              </Text>
             </View>
             <View style={styles.deleteButtonCont}>
-              <Button
-                title={ offline ? 'Go online' : 'Go Offline'}
-                buttonStyle={offline ? styles.onlineButton : styles.offlineButton}
-                disabledStyle={offline ? styles.onlineButton : styles.offlineButton}
-                titleStyle={styles.deleteButtonText}
-                onPress={() => setOfflineMode()}
-                loading={offlineLoading}
-                disabled={offlineLoading}
-              />
+            { guestMode === 'yes'
+              ? <Button
+                  title='Create account'
+                  buttonStyle={offline ? styles.guestButton : styles.guestButton}
+                  disabledStyle={offline ? styles.guestButton : styles.guestButton}
+                  titleStyle={styles.deleteButtonText}
+                  onPress={() => signup()}
+                />
+              : <Button
+                title='Sign Out'
+                buttonStyle={offline ? styles.signOutButton : styles.signOutButton}
+                disabledStyle={offline ? styles.signOutButton : styles.signOutButton}
+                titleStyle={styles.signOutButtonText}
+                onPress={() => signout()}
+                disabled={offline}
+              /> }
             </View>
           </View>
-          <View style={styles.signOut}>
-            <View style={styles.offlineMode}>
-              <Text style={styles.offlineModeTop}>Delete my account</Text>
-              <Text style={styles.offlineModeTitle}>
-                (Warning: This action is irreversible!
-                You will lose all your saved trails.)
-                </Text>
+          { guestMode === 'yes'
+            ? <Text style={styles.guestModeTitle}>
+                Note: In guest mode, your trails are only saved to this device,
+                If you uninstall the app or clear the app data you will loose all your trails.
+                If you want them to be backed up to the server you can create an account
+                using the button above. Then all your saved trails will be backed up to your account
+              </Text>
+            : <View>
+            <View style={styles.signOut}>
+              <View style={styles.offlineMode}>
+                <Text style={styles.offlineModeTop}>Offline mode: { offline ? 'On' : 'Off' }</Text>
+                <Text style={styles.offlineModeTitle}>
+                  (This mode allows you to record and save trails with data/wifi turned off.)
+                  </Text>
+              </View>
+              <View style={styles.deleteButtonCont}>
+                <Button
+                  title={ offline ? 'Go online' : 'Go Offline'}
+                  buttonStyle={offline ? styles.onlineButton : styles.offlineButton}
+                  disabledStyle={offline ? styles.onlineButton : styles.offlineButton}
+                  titleStyle={styles.deleteButtonText}
+                  onPress={() => setOfflineMode()}
+                  loading={offlineLoading}
+                  disabled={offlineLoading}
+                />
+              </View>
             </View>
-            <View style={styles.deleteButtonCont}>
-              <Button
-                title='Delete'
-                buttonStyle={styles.deleteButton}
-                disabledStyle={styles.deleteButton}
-                titleStyle={styles.deleteButtonText}
-                onPress={() => confirmDelete()}
-                loading={loading}
-                disabled={loading}
-              />
+            <View style={styles.signOut}>
+              <View style={styles.offlineMode}>
+                <Text style={styles.offlineModeTop}>Delete my account</Text>
+                <Text style={styles.offlineModeTitle}>
+                  (Warning: This action is irreversible!
+                  You will lose all your saved trails.)
+                  </Text>
+              </View>
+              <View style={styles.deleteButtonCont}>
+                <Button
+                  title='Delete'
+                  buttonStyle={styles.deleteButton}
+                  disabledStyle={styles.deleteButton}
+                  titleStyle={styles.deleteButtonText}
+                  onPress={() => confirmDelete()}
+                  loading={loading}
+                  disabled={loading || offline}
+                />
+              </View>
             </View>
-          </View>
+          </View> }
         </View>
         <Text style={styles.title}>Settings</Text>
         <View style={styles.palette}>
@@ -245,17 +277,21 @@ const paletteStyles = palette => StyleSheet.create({
   signOutButton: {
     borderWidth: 2,
     borderColor: palette.text,
-    padding: 10,
     borderRadius: 20,
-    marginLeft: 'auto',
-    marginRight: 10,
     marginVertical: 5,
     height: 40,
-    alignSelf: 'center',
+    backgroundColor: palette.background,
+    alignSelf: 'flex-end',
+    width: 90,
   },
   deleteButtonText: {
     fontWeight: '600',
     color: 'white',
+    fontSize: 15,
+  },
+  signOutButtonText: {
+    fontWeight: '600',
+    color: palette.text,
     fontSize: 15,
   },
   deleteButton: {
@@ -274,8 +310,8 @@ const paletteStyles = palette => StyleSheet.create({
   },
   offlineButton: {
     borderWidth: 2,
-    borderColor: 'grey',
-    backgroundColor: 'grey',
+    borderColor: palette.text,
+    backgroundColor: palette.text,
     borderRadius: 20,
     marginVertical: 5,
     height: 40,
@@ -292,13 +328,19 @@ const paletteStyles = palette => StyleSheet.create({
     alignSelf: 'flex-end',
     width: 100,
   },
+  guestButton: {
+    borderWidth: 2,
+    borderColor: 'green',
+    backgroundColor: 'green',
+    borderRadius: 20,
+    marginVertical: 5,
+    height: 40,
+    alignSelf: 'flex-end',
+    width: 'auto',
+  },
   offlineButtonText: {
     fontWeight: '600',
     color: 'white',
-  },
-  signOutButtonText: {
-    fontWeight: '600',
-    color: palette.text,
   },
   emailTitle: {
     alignSelf: 'center',
@@ -320,6 +362,14 @@ const paletteStyles = palette => StyleSheet.create({
   offlineModeTitle: {
     marginLeft: 20,
     fontSize: 10,
+    fontWeight: '500',
+    color: palette.text,
+  },
+  guestModeTitle: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 10,
+    fontSize: 11,
     fontWeight: '500',
     color: palette.text,
   },
