@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "tracks-app",
-    "slug": "tracks-app",
+    "name": "Trails MD",
+    "slug": "trails-md",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,17 +16,34 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mightyDukk.trailsmd"
+      "bundleIdentifier": "com.mightyDukk.trailsmd",
+      "config": {
+        "googleMapsApiKey": "AIzaSyBKHqgV-TXmFLOriaRPplE-biTlo448jX8"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#faeed9"
       },
-      "package": "com.mightyDukk.trailsmd"
+      "package": "com.mightyDukk.trailsmd",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBKHqgV-TXmFLOriaRPplE-biTlo448jX8"
+        }
+      },
+      "permissions": ["android.permission.ACCESS_BACKGROUND_LOCATION"]
+    },
+    "androidStatusBar": {
+      "translucent": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4d97e419-1c79-4fbc-82dd-ccdcec675349"
+      }
     }
   }
 }

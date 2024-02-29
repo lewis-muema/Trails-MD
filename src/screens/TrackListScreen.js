@@ -17,6 +17,7 @@ import { Context as locationContext } from '../context/locationContext';
 import { Context as PaletteContext } from '../context/paletteContext';
 import MiniMap from '../components/miniMap';
 import Banner from '../components/banner';
+import Spacer from '../components/Spacer';
 
 const TrackListScreen = () => {
   const navigation = useNavigation();
@@ -83,6 +84,8 @@ const TrackListScreen = () => {
   };
 
   return <ImageBackground source={background.image} resizeMode="cover" style={styles.bg}>
+    <Spacer></Spacer>
+    <Spacer></Spacer>
     <SafeAreaView>
         <Loader offset={true} loading={loading} screen={false} message='Loading' centre={true} />
         <View style={styles.container}>

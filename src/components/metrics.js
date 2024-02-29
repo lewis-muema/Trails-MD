@@ -54,7 +54,7 @@ const Metrics = () => {
                       <View style={styles.metricsValues}>
                         <Text style={styles.metricsValuesTop}>Bearing</Text>
                         <Text style={styles.metricsValuesBottom}>
-                          { `${currentLocation?.coords?.heading}°` }
+                          { `${Math.round(currentLocation?.coords?.heading * 1000) / 1000}°` }
                         </Text>
                       </View>
                     </View>
@@ -68,7 +68,7 @@ const Metrics = () => {
                       <View style={styles.metricsValues}>
                         <Text style={styles.metricsValuesTop}>Elevation</Text>
                         <Text style={styles.metricsValuesBottom}>
-                          { currentLocation?.coords?.altitude }
+                          { Math.round(currentLocation?.coords?.altitude * 1000) / 1000 }
                         </Text>
                       </View>
                     </View>

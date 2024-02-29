@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
-  View, StyleSheet, TouchableOpacity, Image,
+  View, StyleSheet, TouchableOpacity, Image, KeyboardAvoidingView,
 } from 'react-native';
 import { Text, Input, Button } from 'react-native-elements';
 import {
@@ -110,6 +110,11 @@ const PasswordResetScreen = () => {
 
   return <View style={styles.container}>
     <Spacer />
+      <KeyboardAvoidingView
+        style={styles.inputCont}
+        keyboardVerticalOffset={0}
+        behavior={'position'}
+      >
       <View>
         <Loader loading={true} screen={false} message='' centre={false} />
         <View style={styles.trailsLogoCont}>
@@ -281,6 +286,7 @@ const PasswordResetScreen = () => {
           </View>
         </Spacer>
       </View> : null }
+      </KeyboardAvoidingView>
       <Spacer>
         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.signin}>Go back to sign in</Text>

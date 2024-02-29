@@ -6,7 +6,7 @@ import {
 import MapView, {
   Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import moment from 'moment';
 import distanceCalc from './distanceCalc';
 import { Context as PaletteContext } from '../context/paletteContext';
@@ -44,6 +44,7 @@ const MiniMap = ({ locations }) => {
       initialRegion={center()}
       region={center()}
       customMapStyle={palette.mapstyle}
+      liteMode={true}
     >
       { polylines().map((polyline, index) => <Polyline
         key={index}
@@ -57,8 +58,9 @@ const MiniMap = ({ locations }) => {
           title={`Waypoint ${index + 1} starts here`}
           onPress={showCallout}
           onDeselect={hideCallout}
+          tracksViewChanges={false}
         >
-          <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsTop} />
+          <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
         </Marker>)
       }
       { polylines().map((polyline, index) => <Marker
@@ -66,8 +68,9 @@ const MiniMap = ({ locations }) => {
           coordinate={polyline[polyline.length - 1] ? polyline[polyline.length - 1].coords : null}
           title={`Waypoint ${index + 1} ends here`}
           onPress={showCallout}
-          onDeselect={hideCallout}>
-            <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsBottom} />
+          onDeselect={hideCallout}
+          tracksViewChanges={false}>
+            <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }
     </MapView>
@@ -137,8 +140,8 @@ const paletteStyles = palette => StyleSheet.create({
     fontWeight: '500',
   },
   flag: {
-    marginBottom: 15,
-    marginLeft: 10,
+    marginBottom: 0,
+    marginLeft: 15,
     fontSize: 20,
   },
   mapDetails: {

@@ -6,22 +6,22 @@ import {
 import MapView, {
   Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import distanceCalc from './distanceCalc';
 import { Context as PaletteContext } from '../context/paletteContext';
 
-const TrailMap = ({ locations, mapCenter }) => {
+const TrailMap = ({ locations }) => {
   const { centerOfMap, getPolylines } = distanceCalc();
   const center = () => {
-    return locations.locations
-      ? centerOfMap(locations.locations, 0.01)
-      : mapCenter;
+    return centerOfMap(locations.locations, 0.01);
   };
   const { state: { palette } } = useContext(PaletteContext);
   const polylines = () => {
     return locations.locations ? getPolylines(locations.locations) : [];
   };
-
+  if (!locations.locations) {
+    return <View></View>;
+  }
   return <View style={styles.mapContainer}>
     <MapView
       style={styles.map}
@@ -43,7 +43,7 @@ const TrailMap = ({ locations, mapCenter }) => {
           onPress={showCallout}
           onDeselect={hideCallout}
         >
-          <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsTop} />
+          <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
         </Marker>)
       }
       { polylines().map((polyline, index) => <Marker
@@ -52,7 +52,7 @@ const TrailMap = ({ locations, mapCenter }) => {
           title={`Waypoint ${index + 1} ends here`}
           onPress={showCallout}
           onDeselect={hideCallout}>
-            <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsBottom} />
+          <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }
     </MapView>
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   flag: {
-    marginBottom: 15,
-    marginLeft: 10,
+    marginBottom: 0,
+    marginLeft: 15,
     fontSize: 20,
   },
 });

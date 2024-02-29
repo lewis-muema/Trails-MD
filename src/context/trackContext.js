@@ -107,7 +107,8 @@ const avgPace = (locs) => {
   locs.locations.forEach((loc) => {
     speed += loc.coords.speed;
   });
-  return (1 / (speed / locs.locations.length) * (1000 / 60));
+  const pace = locs.locations.length > 1 ? (1 / (speed / locs.locations.length) * (1000 / 60)) : 0;
+  return pace;
 };
 
 const setMapCenter = dispatch => (locations) => {

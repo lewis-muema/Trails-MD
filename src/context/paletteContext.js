@@ -13,6 +13,8 @@ const paletteReducer = (state, action) => {
       return { ...state, background: state.backgrounds[action.payload] };
     case 'fonts_loaded':
       return { ...state, fontsLoaded: action.payload };
+    case 'show_info_card':
+      return { ...state, infoCard: action.payload };
     default:
       return state;
   }
@@ -38,13 +40,23 @@ const fontsLoadedStatus = dispatch => (val) => {
   dispatch({ type: 'fonts_loaded', payload: val });
 };
 
+const showInfoCard = dispatch => (val) => {
+  dispatch({ type: 'show_info_card', payload: val });
+};
+
 export const { Provider, Context } = createDataContext(
   paletteReducer,
-  { changeTheme, changeBG, fontsLoadedStatus },
+  {
+    changeTheme,
+    changeBG,
+    fontsLoadedStatus,
+    showInfoCard,
+  },
   {
     activePalette: 0,
     activeBgImage: 0,
     fontsLoaded: false,
+    infoCard: false,
     palette: {
       background: '#faeed9',
       text: '#113231',

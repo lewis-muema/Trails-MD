@@ -6,7 +6,7 @@ import {
 import MapView, {
   Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { Context as LocationContext } from '../context/locationContext';
 import { Context as PaletteContext } from '../context/paletteContext';
 
@@ -56,7 +56,7 @@ const Map = () => {
         onPress={showCallout}
         onDeselect={hideCallout}
       >
-        <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsTop} />
+          <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
       </Marker>)
     }
     { polylines.map((polyline, index) => <Marker
@@ -69,7 +69,7 @@ const Map = () => {
         { currentLocation.coords.longitude === polyline[polyline.length - 1].coords.longitude
         && currentLocation.coords.latitude === polyline[polyline.length - 1].coords.latitude
           ? <FontAwesome5 name="walking" style={styles.flag} color={palette.text} />
-          : <Ionicons name="md-flag-sharp" style={styles.flag} color={palette.metricsBottom} /> }
+          : <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} /> }
       </Marker>)
     }
     <Marker

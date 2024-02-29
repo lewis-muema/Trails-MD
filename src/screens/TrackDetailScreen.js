@@ -119,6 +119,7 @@ const TrackDetailScreen = ({ route }) => {
                   </View>
               </View>
             </View>
+            { trail.locations.length > 1 ? <View>
               <View style={styles.timeRow}>
                 <Ionicons name="speedometer" size={20} color={palette.text} />
                 <Text style={styles.timeTaken}>
@@ -126,13 +127,14 @@ const TrackDetailScreen = ({ route }) => {
                 </Text>
               </View>
               <LineChart data={trail} field={'speed'} />
-            <View>
+            </View> : null }
+            { trail.locations.length > 1 ? <View>
               <View style={styles.timeRow}>
                 <MaterialCommunityIcons name="elevation-rise" size={20} color={palette.text} />
                 <Text style={styles.timeTaken}>Elevation (m)</Text>
               </View>
               <LineChart data={trail} field={'altitude'} />
-            </View>
+            </View> : null }
           </View> : null }
         </View>
       </ScrollView>

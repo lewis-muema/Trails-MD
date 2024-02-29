@@ -2,7 +2,7 @@ import React, {
   useCallback, useContext, useState, useEffect,
 } from 'react';
 import {
-  View, StyleSheet, Text, TouchableOpacity,
+  View, StyleSheet, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView,
 } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import { useIsFocused, useNavigation, CommonActions } from '@react-navigation/native';
@@ -16,6 +16,7 @@ import { Context as PaletteContext } from '../context/paletteContext';
 import useLocation from '../hooks/useLocation';
 import useSaveTrack from '../hooks/useSaveTrack';
 import Metrics from '../components/metrics';
+import Spacer from '../components/Spacer';
 // import '../_mockLocation';
 
 const nameRef = React.createRef();
@@ -85,12 +86,20 @@ const TrackCreateScreen = ({ route }) => {
 
   const styles = paletteStyles(palette);
 
-  return <View style={styles.outerContainer}>
+  return <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={styles.outerContainer}>
     <View style={styles.mapContainer}>
       <Map />
     </View>
-    <Metrics />
-    <View style={styles.controls}>
+    <View style={styles.metricsCont}>
+      <Spacer></Spacer>
+      <Spacer></Spacer>
+      <Metrics />
+    </View>
+    <KeyboardAvoidingView
+      style={styles.controls}
+      keyboardVerticalOffset={-40}
+      behavior={'position'}
+    >
       <View style={styles.inputCard}>
         {
           !recording && locations.length && savedStatus
@@ -158,8 +167,8 @@ const TrackCreateScreen = ({ route }) => {
         <Banner message={trackSuccess} type='success'></Banner>
         </View> : null
       }
-    </View>
-  </View>;
+    </KeyboardAvoidingView>
+  </ScrollView>;
 };
 
 const paletteStyles = palette => StyleSheet.create({
@@ -173,6 +182,10 @@ const paletteStyles = palette => StyleSheet.create({
     width: '100%',
     height: 250,
     justifyContent: 'center',
+    marginTop: 'auto',
+  },
+  metricsCont: {
+    flex: 1,
   },
   inputCard: {
     backgroundColor: palette.background,
@@ -188,10 +201,10 @@ const paletteStyles = palette => StyleSheet.create({
     shadowRadius: 5,
   },
   outerContainer: {
-    height: '100%',
     width: '100%',
-    position: 'absolute',
-    bottom: 0,
+    // position: 'absolute',
+    // bottom: 0,
+    // top: 0,
   },
   mapContainer: {
     height: '100%',

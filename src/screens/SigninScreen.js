@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
-  View, StyleSheet, TouchableOpacity, Image,
+  View, StyleSheet, TouchableOpacity, Image, KeyboardAvoidingView,
 } from 'react-native';
 import { Text, Input, Button } from 'react-native-elements';
 import {
@@ -76,6 +76,11 @@ const SigninScreen = () => {
 
   return <View style={styles.container}>
     <Spacer />
+      <KeyboardAvoidingView
+        style={styles.inputCont}
+        keyboardVerticalOffset={0}
+        behavior={'position'}
+      >
       <View>
         <Loader loading={true} screen={false} message='' centre={false} />
         <View style={styles.trailsLogoCont}>
@@ -153,6 +158,7 @@ const SigninScreen = () => {
           />
         </View>
       </Spacer>
+      </KeyboardAvoidingView>
       <Spacer>
         <View style={styles.signupButtonContainer}>
           <Button
@@ -178,8 +184,8 @@ const SigninScreen = () => {
 
 const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: palette.background,
+    flex: 1,
     justifyContent: 'center',
   },
   title: {
@@ -201,6 +207,9 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   inputContainer: {
     width: '90%',
     alignSelf: 'center',
+  },
+  inputCont: {
+    backgroundColor: palette.background,
   },
   inputTextSytle: {
     marginLeft: 10,
@@ -248,8 +257,7 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
     alignItems: 'flex-start',
     display: fontsLoaded ? 'grid' : 'none',
     alignSelf: 'center',
-    marginBottom: 20,
-    marginTop: -20,
+    marginTop: -30,
   },
   trailsLogoText: {
     fontFamily: fontsLoaded ? 'manuscript-font' : '',

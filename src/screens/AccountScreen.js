@@ -20,6 +20,7 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as PaletteContext } from '../context/paletteContext';
 import Banner from '../components/banner';
+import InfoCard from '../components/infoCard';
 import Spacer from '../components/Spacer';
 
 const AccountScreen = () => {
@@ -42,7 +43,7 @@ const AccountScreen = () => {
     state:
     {
       palette, palettes, activePalette, background, backgrounds, activeBgImage,
-    }, changeTheme, changeBG,
+    }, changeTheme, changeBG, showInfoCard,
   } = useContext(PaletteContext);
 
   const useImageColors = async () => {
@@ -100,6 +101,7 @@ const AccountScreen = () => {
   }, []);
 
   return <ImageBackground source={background.image} resizeMode="cover" style={styles.bg}>
+    <Spacer></Spacer>
     <SafeAreaView>
       <View>
         <Text style={styles.title}>Account</Text>
@@ -126,7 +128,7 @@ const AccountScreen = () => {
                 disabledStyle={offline ? styles.signOutButton : styles.signOutButton}
                 titleStyle={styles.signOutButtonText}
                 onPress={() => signout()}
-                disabled={offline}
+                disabled={!!offline}
               /> }
             </View>
           </View>
@@ -173,7 +175,7 @@ const AccountScreen = () => {
                   titleStyle={styles.deleteButtonText}
                   onPress={() => confirmDelete()}
                   loading={loading}
-                  disabled={loading || offline}
+                  disabled={loading || !!offline}
                 />
               </View>
             </View>
@@ -240,8 +242,19 @@ const AccountScreen = () => {
             />
           </View>
         </View>
+        <TouchableOpacity onPress={() => showInfoCard(true)}>
+          <View style={styles.privacyButtonTop}>
+            <Text style={styles.privacyButton}>PRIVACY POLICY</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
+    <InfoCard message={['This app allows you to record trails on your phone both offline and online. In order to work in online mode an internet connection is required to communicate with the server.',
+      'This app sends the trails to the server as a backup. If you prefer to not send your trails to the server feel free to utilise the offline mode and guest mode. These modes store your data locally on your device.',
+      'Privacy is a key priority to me and hence I have devoted to make all the processes in this app as secure as possible from using encryption of credentials during login to refreshing tokens on a regular basis.',
+      'All the data collected in this app is stored securely and can only be accessed by logged in users. The data can be deleted at any moment using the delete account button. This will delete your account along with all the trails associated with it.',
+      'If you find any security vulnerability that has been inadvertently caused by me, or have any question regarding how the app protects your privacy, please send me an email at mdkkcontact@gmail.com']}
+    title='Privacy policy' />
     { error ? <View style={styles.error}>
       <Banner message={error} type='error'></Banner>
       </View> : null
@@ -273,6 +286,21 @@ const paletteStyles = palette => StyleSheet.create({
   signOut: {
     flexDirection: 'row',
     marginVertical: 5,
+  },
+  privacyButton: {
+    marginVertical: 15,
+    backgroundColor: palette.background,
+    color: palette.text,
+    textAlign: 'center',
+    borderRadius: 10,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  privacyButtonTop: {
+    borderRadius: 10,
+    backgroundColor: palette.background,
+    marginHorizontal: 20,
+    marginTop: 30,
   },
   signOutButton: {
     borderWidth: 2,
