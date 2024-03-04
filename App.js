@@ -40,7 +40,13 @@ function Home() {
       headerShown: false,
       tabBarActiveTintColor: palette.background,
       tabBarInactiveTintColor: palette.buttonsInactive,
-      tabBarStyle: { backgroundColor: palette.text, borderTopWidth: 0, justifyContent: 'center' },
+      tabBarStyle: {
+        backgroundColor: palette.text,
+        borderTopWidth: 0,
+        justifyContent: 'center',
+        height: 60,
+        paddingBottom: 10,
+      },
     }}>
       <Bottom.Screen name="Tracks" component={Tracks} options={{
         title: 'Trails',

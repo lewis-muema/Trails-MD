@@ -44,7 +44,6 @@ const MiniMap = ({ locations }) => {
       initialRegion={center()}
       region={center()}
       customMapStyle={palette.mapstyle}
-      liteMode={true}
     >
       { polylines().map((polyline, index) => <Polyline
         key={index}

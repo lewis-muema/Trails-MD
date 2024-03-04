@@ -42,6 +42,7 @@ const TrailMap = ({ locations }) => {
           title={`Waypoint ${index + 1} starts here`}
           onPress={showCallout}
           onDeselect={hideCallout}
+          tracksViewChanges={false}
         >
           <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
         </Marker>)
@@ -51,7 +52,9 @@ const TrailMap = ({ locations }) => {
           coordinate={polyline[polyline.length - 1] ? polyline[polyline.length - 1].coords : null}
           title={`Waypoint ${index + 1} ends here`}
           onPress={showCallout}
-          onDeselect={hideCallout}>
+          onDeselect={hideCallout}
+          tracksViewChanges={false}
+          >
           <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }

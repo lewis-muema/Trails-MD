@@ -138,7 +138,7 @@ const PasswordResetScreen = () => {
           ref={emailRef}
           label='Email'
           value={email}
-          onChangeText={val => setEmail(val)}
+          onChangeText={val => setEmail(val.replaceAll(' ', ''))}
           onBlur={emailValidator}
           errorMessage={emailErr}
           labelStyle={styles.label}
@@ -173,7 +173,7 @@ const PasswordResetScreen = () => {
           ref={passRef}
           label='New password'
           value={password}
-          onChangeText={val => setPassword(val)}
+          onChangeText={val => setPassword(val.replaceAll(' ', ''))}
           labelStyle={styles.label}
           inputStyle={styles.inputTextSytle}
           placeholderTextColor={palette.text}
@@ -200,7 +200,7 @@ const PasswordResetScreen = () => {
           ref={passRef}
           label='Confirm new password'
           value={confirm}
-          onChangeText={val => setConfirm(val)}
+          onChangeText={val => setConfirm(val.replaceAll(' ', ''))}
           onBlur={passwordValidator}
           errorMessage={passErr}
           labelStyle={styles.label}
@@ -288,7 +288,7 @@ const PasswordResetScreen = () => {
       </View> : null }
       </KeyboardAvoidingView>
       <Spacer>
-        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Signin')}>
           <Text style={styles.signin}>Go back to sign in</Text>
         </TouchableOpacity>
       </Spacer>

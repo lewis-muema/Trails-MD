@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import React, { useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   ActivityIndicator, StyleSheet, View, Text,
 } from 'react-native';
@@ -11,15 +11,34 @@ import { Context as LocationContext } from '../context/locationContext';
 import { Context as PaletteContext } from '../context/paletteContext';
 
 const Map = () => {
+  const [coords, setCoords] = useState({ longitude: 0, latitude: 0 });
+  const [regionStat, setRegionStat] = useState(true);
+  const [count, setCount] = useState(1);
   const {
     state: { currentLocation, polylines }, setPolyLines,
   } = useContext(LocationContext);
   const { state: { palette } } = useContext(PaletteContext);
   useEffect(() => {
     setPolyLines();
+    if ((currentLocation && regionStat === true) || (currentLocation && coords.longitude === 0)) {
+      setCoords(currentLocation.coords);
+    }
+    if (count >= 10) {
+      setRegionStat(false);
+      setCount(count - 1);
+    } else {
+      setRegionStat(true);
+      setCount(1);
+    }
   }, [currentLocation]);
-
-
+  const changeZoom = (region) => {
+    if (count <= 30) { // increase duration between drag and reset
+      setCount(count + 1);
+    }
+    if (count >= 10) {
+      setRegionStat(false);
+    }
+  };
   if (!currentLocation) {
     return <View>
       <Text style={styles.loadingText}>
@@ -32,15 +51,16 @@ const Map = () => {
     provider={PROVIDER_GOOGLE}
     style={styles.map}
     initialRegion={{
-      ...currentLocation.coords,
+      ...coords,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     }}
     region={{
-      ...currentLocation.coords,
+      ...coords,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     }}
+    onRegionChange={changeZoom}
     customMapStyle={palette.mapstyle}
   >
     { polylines.map((polyline, index) => <Polyline
@@ -55,6 +75,7 @@ const Map = () => {
         title={`Waypoint ${index + 1} starts here`}
         onPress={showCallout}
         onDeselect={hideCallout}
+        tracksViewChanges={false}
       >
           <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
       </Marker>)
@@ -65,6 +86,7 @@ const Map = () => {
         title={`Waypoint ${index + 1} ends here`}
         onPress={showCallout}
         onDeselect={hideCallout}
+        tracksViewChanges={false}
       >
         { currentLocation.coords.longitude === polyline[polyline.length - 1].coords.longitude
         && currentLocation.coords.latitude === polyline[polyline.length - 1].coords.latitude
@@ -77,6 +99,7 @@ const Map = () => {
       title='You are here'
       onPress={showCallout}
       onDeselect={hideCallout}
+      tracksViewChanges={false}
     >
       <FontAwesome5 name="walking" style={styles.flag} color="#5c2f16" />
     </Marker>

@@ -103,7 +103,7 @@ const SigninScreen = () => {
         ref={emailRef}
         label='Email'
         value={email}
-        onChangeText={val => setEmail(val)}
+        onChangeText={val => setEmail(val.replaceAll(' ', ''))}
         onBlur={emailValidator}
         errorMessage={emailErr}
         labelStyle={styles.label}
@@ -121,7 +121,7 @@ const SigninScreen = () => {
         ref={passRef}
         label='Password'
         value={password}
-        onChangeText={val => setPassword(val)}
+        onChangeText={val => setPassword(val.replaceAll(' ', ''))}
         labelStyle={styles.label}
         inputStyle={styles.inputTextSytle}
         placeholderTextColor={palette.text}

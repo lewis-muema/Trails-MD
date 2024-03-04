@@ -245,6 +245,9 @@ const deleteTrack = dispatch => (loading, id, navigateToList, offline) => {
     trails.delete(`/tracks/${id}`).then((res) => {
       loading(false);
       dispatch({ type: 'add_success', payload: res?.data.message });
+      setTimeout(() => {
+        dispatch({ type: 'delete_success' });
+      }, 5000);
       navigateToList();
     }).catch((err) => {
       loading(false);

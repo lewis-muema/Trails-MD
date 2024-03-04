@@ -7,7 +7,7 @@ import {
 import { Input, Button } from 'react-native-elements';
 import { useIsFocused, useNavigation, CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons, AntDesign } from '@expo/vector-icons';
 import Map from '../components/map';
 import Banner from '../components/banner';
 import { Context as locationContext } from '../context/locationContext';
@@ -40,6 +40,7 @@ const TrackCreateScreen = ({ route }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [offline, setOffline] = useState('');
+  const [mode, setMode] = useState('');
   // useCallback maintains the state of the function sent
   // to the watcher to prevent it from sending a new callback every time react rerenders.
   const callback = useCallback(location => addLocation(location, recording), [recording]);
@@ -76,17 +77,15 @@ const TrackCreateScreen = ({ route }) => {
   useEffect(() => {
     navigation.addListener('focus', async () => {
       const val = await AsyncStorage.getItem('offline');
-      const mode = await AsyncStorage.getItem('mode');
-      if (mode === 'create') {
-        reset();
-      }
+      const modeVal = await AsyncStorage.getItem('mode');
+      setMode(modeVal);
       setOffline(val);
     });
   }, []);
 
   const styles = paletteStyles(palette);
 
-  return <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={styles.outerContainer}>
+  return <View style={styles.outerContainer}>
     <View style={styles.mapContainer}>
       <Map />
     </View>
@@ -102,11 +101,11 @@ const TrackCreateScreen = ({ route }) => {
     >
       <View style={styles.inputCard}>
         {
-          !recording && locations.length && savedStatus
+          !recording && locations.length
             ? <TouchableOpacity style={{ zIndex: 1000 }} onPress={() => reset()}>
                 <View style={styles.addTrail}>
-                  <Ionicons name="add-circle-sharp" size={16} color={palette.metricsTop} />
-                  <Text style={styles.addTrailText}>Add New Trail</Text>
+                  <AntDesign name="closecircle" size={15} color={palette.metricsTop} style={{ marginRight: 3 }} />
+                  <Text style={styles.addTrailText}>Reset Trail</Text>
                 </View>
               </TouchableOpacity>
             : null
@@ -168,7 +167,7 @@ const TrackCreateScreen = ({ route }) => {
         </View> : null
       }
     </KeyboardAvoidingView>
-  </ScrollView>;
+  </View>;
 };
 
 const paletteStyles = palette => StyleSheet.create({
@@ -183,9 +182,6 @@ const paletteStyles = palette => StyleSheet.create({
     height: 250,
     justifyContent: 'center',
     marginTop: 'auto',
-  },
-  metricsCont: {
-    flex: 1,
   },
   inputCard: {
     backgroundColor: palette.background,
@@ -202,9 +198,9 @@ const paletteStyles = palette => StyleSheet.create({
   },
   outerContainer: {
     width: '100%',
-    // position: 'absolute',
-    // bottom: 0,
-    // top: 0,
+    position: 'absolute',
+    bottom: 0,
+    top: 0,
   },
   mapContainer: {
     height: '100%',

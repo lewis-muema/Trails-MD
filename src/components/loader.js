@@ -99,6 +99,7 @@ const paletteStyles = (palette, screen, offset, centre) => StyleSheet.create({
     ...loaderType(screen, offset, centre),
     alignItems: 'center',
     width: '100%',
+    zIndex: 10000,
   },
   NoloadingContainer: {
     display: 'none',

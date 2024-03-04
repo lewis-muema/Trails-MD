@@ -87,15 +87,13 @@ const TrackListScreen = () => {
     <Spacer></Spacer>
     <Spacer></Spacer>
     <SafeAreaView>
-        <Loader offset={true} loading={loading} screen={false} message='Loading' centre={true} />
+        <Loader offset={true} loading={loading} screen={false} message='' centre={true} />
         <View style={styles.container}>
           <View style={styles.flexRow}>
             <View style={styles.trailsLogoCont}>
               <Svg
                 style={styles.trailsLogoBG}
                 xmlns="http://www.w3.org/2000/svg"
-                width={275}
-                height={160}
                 viewBox="0 0 300 120"
                 fill={palette.background}
               >
@@ -204,7 +202,7 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   joinView: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: '85%',
+    height: '82%',
     zIndex: 1000,
   },
   joinViewBanner: {
@@ -294,7 +292,9 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   bg: {
     height: '100%',
   },
-  miniMap: {},
+  miniMap: {
+    pointerEvents: 'none',
+  },
   miniMapContainer: {
     width: '100%',
   },
@@ -342,6 +342,7 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     display: fontsLoaded ? 'grid' : 'none',
+    position: 'relative',
   },
   trailsLogoText: {
     fontFamily: fontsLoaded ? 'manuscript-font' : '',
@@ -358,8 +359,10 @@ const paletteStyles = (palette, fontsLoaded) => StyleSheet.create({
   },
   trailsLogoBG: {
     position: 'absolute',
-    top: -46,
-    left: -19,
+    height: '140%',
+    width: '130%',
+    top: '-27%',
+    left: '-15%',
   },
 });
 

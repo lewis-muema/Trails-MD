@@ -33,7 +33,7 @@ export default (tracking, callback) => {
         if (foregroundStatus.status === 'granted') {
           subscriber = await watchPositionAsync({
             accuracy: Accuracy.BestForNavigation,
-            distanceInterval: 10,
+            distanceInterval: 1,
           }, callback);
         }
         setErr(e);
