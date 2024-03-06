@@ -71,11 +71,7 @@ export default (tracking, callback) => {
         trigger: null,
       });
     } else {
-      if (Platform.OS === 'android') {
-        await Notifications.dismissAllNotificationsAsync();
-      } else {
-        await Notifications.dismissAllNotificationsIOS();
-      }
+      await Notifications.dismissAllNotificationsAsync();
     }
   };
   return [err];

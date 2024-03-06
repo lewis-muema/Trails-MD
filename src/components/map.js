@@ -1,7 +1,7 @@
 /* eslint-disable no-plusplus */
 import React, { useState, useContext, useEffect } from 'react';
 import {
-  ActivityIndicator, StyleSheet, View, Text,
+  ActivityIndicator, StyleSheet, View, Text, Platform,
 } from 'react-native';
 import MapView, {
   Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
@@ -75,7 +75,7 @@ const Map = () => {
         title={`Waypoint ${index + 1} starts here`}
         onPress={showCallout}
         onDeselect={hideCallout}
-        tracksViewChanges={false}
+        tracksViewChanges={Platform.OS === 'ios'}
       >
           <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
       </Marker>)
@@ -86,7 +86,7 @@ const Map = () => {
         title={`Waypoint ${index + 1} ends here`}
         onPress={showCallout}
         onDeselect={hideCallout}
-        tracksViewChanges={false}
+        tracksViewChanges={Platform.OS === 'ios'}
       >
         { currentLocation.coords.longitude === polyline[polyline.length - 1].coords.longitude
         && currentLocation.coords.latitude === polyline[polyline.length - 1].coords.latitude
@@ -99,7 +99,7 @@ const Map = () => {
       title='You are here'
       onPress={showCallout}
       onDeselect={hideCallout}
-      tracksViewChanges={false}
+      tracksViewChanges={Platform.OS === 'ios'}
     >
       <FontAwesome5 name="walking" style={styles.flag} color="#5c2f16" />
     </Marker>

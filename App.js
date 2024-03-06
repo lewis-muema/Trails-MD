@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -44,8 +45,8 @@ function Home() {
         backgroundColor: palette.text,
         borderTopWidth: 0,
         justifyContent: 'center',
-        height: 60,
-        paddingBottom: 10,
+        height: Platform.OS === 'ios' ? 70 : 60,
+        paddingBottom: Platform.OS === 'ios' ? 20 : 10,
       },
     }}>
       <Bottom.Screen name="Tracks" component={Tracks} options={{

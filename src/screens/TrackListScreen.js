@@ -15,9 +15,10 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as locationContext } from '../context/locationContext';
 import { Context as PaletteContext } from '../context/paletteContext';
-import MiniMap from '../components/miniMap';
 import Banner from '../components/banner';
 import Spacer from '../components/Spacer';
+import TrackList from '../components/trackList';
+import TrackThemeBottom from '../components/trackThemeBottom';
 
 const TrackListScreen = () => {
   const navigation = useNavigation();
@@ -144,26 +145,7 @@ const TrackListScreen = () => {
                 <FontAwesome style={styles.joinButtonIcon} name="hand-pointer-o" />
               </TouchableOpacity>
             </View> : null }
-            <FlatList
-              removeClippedSubviews={true}
-              horizontal={false}
-              showsVerticalScrollIndicator={false}
-              data={trails}
-              style={styles.miniMapContainer}
-              refreshControl={
-                <RefreshControl refreshing={loading} onRefresh={onRefresh} />
-              }
-              initialNumToRender={5}
-              renderItem={({ item, index }) => <TouchableOpacity
-                activeOpacity={1}
-                 onPress={() => viewTrack(item, index)}
-                 onLongPress={() => select(index)}>
-                  <View style={styles.miniMap}>
-                    <MiniMap locations={item} />
-                  </View>
-                </TouchableOpacity>
-              }
-            />
+            <TrackList trails={trails} loading={loading} onRefresh={() => onRefresh()} viewTrack={(item, index) => viewTrack(item, index)} select={(index) => select(index)} />
             { error ? <View style={styles.error}>
               <Banner message={error} type='error'></Banner>
               </View> : null
