@@ -18,7 +18,7 @@ import { Context as PaletteContext } from '../context/paletteContext';
 import Banner from '../components/banner';
 import Spacer from '../components/Spacer';
 import TrackList from '../components/trackList';
-import TrackThemeBottom from '../components/trackThemeBottom';
+import TrackThemeBottom from '../components/singleTrack';
 
 const TrackListScreen = () => {
   const navigation = useNavigation();

@@ -4,7 +4,7 @@ import {
   TouchableOpacity, RefreshControl,
 } from 'react-native';
 import moment from 'moment';
-import MiniMap from './miniMapTheme';
+import MiniMap from './singleMiniMap';
 import distanceCalc from './distanceCalc';
 import { Context as PaletteContext } from '../context/paletteContext';
 
