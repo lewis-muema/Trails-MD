@@ -10,6 +10,7 @@ import moment from 'moment';
 import {
   FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, AntDesign,
 } from '@expo/vector-icons';
+import Slider from '@react-native-community/slider';
 import { Context as locationContext } from '../context/locationContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as PaletteContext } from '../context/paletteContext';
@@ -34,6 +35,7 @@ const TrackDetailScreen = ({ route }) => {
     }, fetchOneTrack, deleteTrack,
   } = useContext(trackContext);
   const { state: { palette } } = useContext(PaletteContext);
+  const { state: { play, progress }, setProgress, setPlay } = useContext(locationContext);
 
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const headerScrollHeight = scrollOffsetY.interpolate({
@@ -74,6 +76,22 @@ const TrackDetailScreen = ({ route }) => {
     });
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (progress <= trail.locations.length) {
+        setProgress(progress + 1);
+      } else {
+        setProgress(0);
+        setPlay(false);
+        clearInterval(interval);
+      }
+    }, 1000);
+    if (play === false) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [play, progress]);
+
   const styles = paletteStyles(palette);
 
   return <View style={styles.detailsContainer}>
@@ -89,7 +107,7 @@ const TrackDetailScreen = ({ route }) => {
               <View>
                 <Text style={styles.mapDetailsLeftTextTop}>{ trail.name }</Text>
                 <Text style={styles.mapDetailsLeftTextBottom}>
-                  { moment(trail?.locations[0]?.timestamp).format('MMMM Do, YYYY HH:mm a') }
+                  { moment(trail?.locations[0]?.timestamp).format('MMMM Do, YYYY hh:mm a') }
                 </Text>
               </View>
               <View style={styles.mapDetailsRight}>
@@ -157,11 +175,32 @@ const TrackDetailScreen = ({ route }) => {
               <TrailMap locations={trail} mapCenter={mapCenter} />
               <View style={styles.actionsMenu}>
                 <TouchableOpacity onPress={() => edit()}>
-                  <AntDesign name="edit" style={styles.actionIcons} size={25} color="#113231" />
+                  <AntDesign name="edit" style={styles.actionIcons} size={25} color={palette.text} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => confirmDelete()}>
                   <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
                 </TouchableOpacity>
+              </View>
+              <View style={styles.playActions}>
+                <TouchableOpacity onPress={() => setPlay(!play)}>
+                  <View style={styles.playIcon}>
+                    { !play ? <FontAwesome name="play" size={25} color={palette.background} style={{ marginRight: -5 }} />
+                      : <FontAwesome name="pause" size={24} color={palette.background} /> }
+                  </View>
+                </TouchableOpacity>
+                { progress >= 1 ? <View style={styles.playSlider}>
+                  <Slider
+                    style={{ width: '100%', height: 40 }}
+                    value={progress}
+                    onSlidingComplete={val => setProgress(Math.trunc(val))}
+                    tapToSeek={true}
+                    minimumValue={0}
+                    maximumValue={trail ? trail?.locations?.length : 100}
+                    minimumTrackTintColor={palette.metricsBottom}
+                    maximumTrackTintColor={palette.text}
+                  />
+                  { trail?.locations[progress]?.timestamp ? <Text style={styles.timestamp}>{ moment(trail?.locations[progress]?.timestamp).format('hh:mm a') }</Text> : null }
+                </View> : null }
               </View>
             </View>
           </View>
@@ -191,6 +230,32 @@ const paletteStyles = palette => StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     bottom: 0,
+  },
+  playActions: {
+    position: 'absolute',
+    bottom: 40,
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  playIcon: {
+    backgroundColor: palette.text,
+    height: 70,
+    width: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 40,
+  },
+  playSlider: {
+    width: '80%',
+    marginLeft: 'auto',
+  },
+  timestamp: {
+    position: 'absolute',
+    right: 0,
+    top: -15,
+    fontSize: 16,
+    fontWeight: '700',
   },
   detailsContainer: {
     flex: 1,

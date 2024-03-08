@@ -145,7 +145,11 @@ const TrackListScreen = () => {
                 <FontAwesome style={styles.joinButtonIcon} name="hand-pointer-o" />
               </TouchableOpacity>
             </View> : null }
-            <TrackList trails={trails} loading={loading} onRefresh={() => onRefresh()} viewTrack={(item, index) => viewTrack(item, index)} select={(index) => select(index)} />
+            <TrackList trails={trails}
+              loading={loading}
+              onRefresh={() => onRefresh()}
+              viewTrack={(item, index) => viewTrack(item, index)}
+              select={index => select(index)} />
             { error ? <View style={styles.error}>
               <Banner message={error} type='error'></Banner>
               </View> : null

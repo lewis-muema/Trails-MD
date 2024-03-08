@@ -56,7 +56,7 @@ const TrackThemeBottom = ({
             <View>
               <Text style={styles.mapDetailsLeftTextTop}>{ item.name }</Text>
               <Text style={styles.mapDetailsLeftTextBottom}>
-                { moment(item.locations[0].timestamp).format('MMMM Do, YYYY HH:mm a') }
+                { moment(item.locations[0].timestamp).format('MMMM Do, YYYY hh:mm a') }
               </Text>
             </View>
             <View style={styles.mapDetailsRight}>

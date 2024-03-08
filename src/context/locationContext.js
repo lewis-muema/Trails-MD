@@ -31,6 +31,10 @@ const locationReducer = (state, action) => {
       return { ...state, trackStatus: action.payload };
     case 'saved_status':
       return { ...state, savedStatus: action.payload };
+    case 'set_play':
+      return { ...state, play: action.payload };
+    case 'set_progress':
+      return { ...state, progress: action.payload };
     case 'reset':
       return {
         ...state,
@@ -113,6 +117,14 @@ const setPolyLines = dispatch => () => {
   dispatch({ type: 'set_polylines' });
 };
 
+const setPlay = dispatch => (val) => {
+  dispatch({ type: 'set_play', payload: val });
+};
+
+const setProgress = dispatch => (val) => {
+  dispatch({ type: 'set_progress', payload: val });
+};
+
 const setLocations = dispatch => (name, locations, index) => {
   dispatch({ type: 'set_locations', payload: locations });
   dispatch({ type: 'set_index', payload: index });
@@ -131,6 +143,8 @@ export const { Context, Provider } = createDataContext(
     changeSavedStatus,
     setLocations,
     reset,
+    setPlay,
+    setProgress,
   },
   {
     recording: false,
@@ -142,5 +156,7 @@ export const { Context, Provider } = createDataContext(
     distance: 0,
     trackStatus: 'Start Tracking',
     savedStatus: false,
+    play: false,
+    progress: 0,
   },
 );

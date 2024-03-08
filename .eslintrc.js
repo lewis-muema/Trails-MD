@@ -25,5 +25,6 @@ module.exports = {
     'no-unused-vars': 'off',
     'consistent-return': 'off',
     'no-lonely-if': 'off',
+    'no-shadow': 'off',
   },
 };

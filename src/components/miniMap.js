@@ -77,7 +77,7 @@ const MiniMap = ({ locations }) => {
       <View>
         <Text style={styles.mapDetailsLeftTextTop}>{ locations.name }</Text>
         <Text style={styles.mapDetailsLeftTextBottom}>
-          { moment(locations.locations[0].timestamp).format('MMMM Do, YYYY HH:mm a') }
+          { moment(locations.locations[0].timestamp).format('MMMM Do, YYYY hh:mm a') }
         </Text>
       </View>
       <View style={styles.mapDetailsRight}>

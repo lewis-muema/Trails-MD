@@ -1,17 +1,19 @@
 /* eslint-disable no-plusplus */
 import React, { useContext } from 'react';
 import {
-  StyleSheet, View,
+  StyleSheet, View, Platform,
 } from 'react-native';
 import MapView, {
   Polyline, Marker, showCallout, hideCallout, PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import distanceCalc from './distanceCalc';
 import { Context as PaletteContext } from '../context/paletteContext';
+import { Context as locationContext } from '../context/locationContext';
 
 const TrailMap = ({ locations }) => {
   const { centerOfMap, getPolylines } = distanceCalc();
+  const { state: { play, progress } } = useContext(locationContext);
   const center = () => {
     return centerOfMap(locations.locations, 0.01);
   };
@@ -58,6 +60,15 @@ const TrailMap = ({ locations }) => {
           <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }
+      { progress > 0 || play ? <Marker
+        coordinate={locations?.locations[progress]?.coords}
+        title='You were here'
+        onPress={showCallout}
+        onDeselect={hideCallout}
+        tracksViewChanges={Platform.OS === 'ios'}
+      >
+        <FontAwesome5 name="walking" style={styles.flag} color={palette.text} />
+      </Marker> : null }
     </MapView>
   </View>;
 };
