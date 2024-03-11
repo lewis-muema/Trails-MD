@@ -78,7 +78,7 @@ const TrackDetailScreen = ({ route }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (progress <= trail.locations.length) {
+      if (progress < trail.locations.length) {
         setProgress(progress + 1);
       } else {
         setProgress(0);
@@ -256,6 +256,10 @@ const paletteStyles = palette => StyleSheet.create({
     top: -15,
     fontSize: 16,
     fontWeight: '700',
+    backgroundColor: palette.background,
+    color: palette.text,
+    padding: 2,
+    borderRadius: 5,
   },
   detailsContainer: {
     flex: 1,

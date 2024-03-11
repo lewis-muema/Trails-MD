@@ -60,7 +60,8 @@ const TrailMap = ({ locations }) => {
           <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }
-      { progress > 0 || play ? <Marker
+      { (progress > 0 || play) && locations?.locations[progress]?.coords
+        ? <Marker
         coordinate={locations?.locations[progress]?.coords}
         title='You were here'
         onPress={showCallout}

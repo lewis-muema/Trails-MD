@@ -99,6 +99,11 @@ const lineChart = ({ data, field }) => {
               }} />}
               theme={{
                 stroke: { color: palette.text, width: 2 },
+                scatter: {
+                  selected: {
+                    color: palette.text, width: 6, height: 6, rx: 6,
+                  },
+                },
               }}
               smoothing="cubic-spline"
             />
