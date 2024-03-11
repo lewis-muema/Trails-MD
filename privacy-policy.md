@@ -1,4 +1,4 @@
-## Trails MD BFF: Privacy policy
+## Trails MD: Privacy policy
 
 This app allows you to record trails on your phone both offline and online. In order to work in online mode an internet connection is required to communicate with the server. The BFF for this app is hosted on gcloud and the source code is available on github under the MIT license.
 
