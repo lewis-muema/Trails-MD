@@ -65,6 +65,14 @@ const AccountScreen = () => {
     navigation.navigate('Auth', { screen: 'Signup' });
   };
 
+  const exitGuestMode = async () => {
+    saveTrailsOffline('', () => offlineMode(''), () => {});
+    await AsyncStorage.removeItem('guest');
+    await AsyncStorage.removeItem('deleted_trails_state');
+    await AsyncStorage.removeItem('offline');
+    navigation.navigate('Auth', { screen: 'Signin' });
+  };
+
   const confirmDelete = () => {
     Alert.alert(
       'Delete your account',
@@ -132,6 +140,24 @@ const AccountScreen = () => {
               /> }
             </View>
           </View>
+          { guestMode === 'yes'
+            ? <View style={styles.signOut}>
+            <View style={styles.offlineMode}>
+              <Text style={styles.offlineModeTop}>Use another account</Text>
+              <Text style={styles.offlineModeTitle}>
+                (Exit guest mode)
+              </Text>
+            </View>
+            <View style={styles.deleteButtonCont}>
+                <Button
+                  title={ 'Sign in' }
+                  buttonStyle={styles.offlineButton}
+                  disabledStyle={styles.offlineButton}
+                  titleStyle={styles.deleteButtonText}
+                  onPress={() => exitGuestMode()}
+                />
+              </View>
+          </View> : null }
           { guestMode === 'yes'
             ? <Text style={styles.guestModeTitle}>
                 Note: In guest mode, your trails are only saved to this device,

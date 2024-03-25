@@ -2,14 +2,17 @@ import React, {
   useCallback, useContext, useState, useEffect,
 } from 'react';
 import {
-  View, StyleSheet, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView,
+  View, StyleSheet, Text, TouchableOpacity, Alert,
+  ScrollView, KeyboardAvoidingView, Keyboard,
 } from 'react-native';
+import { fetch } from '@react-native-community/netinfo';
 import { Input, Button } from 'react-native-elements';
 import { useIsFocused, useNavigation, CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather, Ionicons, AntDesign } from '@expo/vector-icons';
 import Map from '../components/map';
 import Banner from '../components/banner';
+import { Context as AuthContext } from '../context/AuthContext';
 import { Context as locationContext } from '../context/locationContext';
 import { Context as trackContext } from '../context/trackContext';
 import { Context as PaletteContext } from '../context/paletteContext';
@@ -34,13 +37,15 @@ const TrackCreateScreen = ({ route }) => {
     changeName,
     reset,
   } = useContext(locationContext);
+  const { offlineMode } = useContext(AuthContext);
   const { state: { palette } } = useContext(PaletteContext);
-  const { state: { trail }, setMapCenter } = useContext(trackContext);
+  const { state: { trail }, setMapCenter, saveTrailsOffline } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [offline, setOffline] = useState('');
   const [mode, setMode] = useState('');
+  const [guest, setGuest] = useState('');
   // useCallback maintains the state of the function sent
   // to the watcher to prevent it from sending a new callback every time react rerenders.
   const callback = useCallback(location => addLocation(location, recording), [recording]);
@@ -49,9 +54,44 @@ const TrackCreateScreen = ({ route }) => {
   const record = () => {
     if (name) {
       recording ? stopRecording() : startRecording();
+      Keyboard.dismiss();
     } else {
       nameRef.current.shake();
       setError('Please enter a name to start tracking');
+    }
+  };
+
+  const saveTrail = () => {
+    fetch().then((state) => {
+      if (state.isConnected || guest === 'yes') {
+        saveTrack(val => setLoading(val), offline);
+      } else if (!offline) {
+        Alert.alert(
+          'You are offline',
+          'You seem to be offline. Would you like to use offline mode?', [
+            {
+              text: 'Cancel',
+              onPress: () => {},
+              style: 'cancel',
+            },
+            {
+              text: 'Go Offline',
+              onPress: () => setOfflineMode(),
+              style: 'default',
+            },
+          ],
+        );
+      }
+    });
+  };
+
+  const setOfflineMode = () => {
+    saveTrailsOffline('offline', () => offlineMode('offline'), off => saveTrailOffline(off));
+  };
+
+  const saveTrailOffline = (off) => {
+    if (!off) {
+      saveTrack(val => setLoading(val), 'offline');
     }
   };
 
@@ -78,6 +118,8 @@ const TrackCreateScreen = ({ route }) => {
     navigation.addListener('focus', async () => {
       const val = await AsyncStorage.getItem('offline');
       const modeVal = await AsyncStorage.getItem('mode');
+      const guestVal = await AsyncStorage.getItem('guest');
+      setGuest(guestVal);
       setMode(modeVal);
       setOffline(val);
     });
@@ -126,6 +168,7 @@ const TrackCreateScreen = ({ route }) => {
           inputContainerStyle={{ borderColor: palette.text }}
           autoCorrect={false}
           errorMessage={error}
+          disabled={recording}
           leftIcon={
             <Feather name="map-pin" size={18} color={palette.text} />
           }
@@ -145,17 +188,17 @@ const TrackCreateScreen = ({ route }) => {
               buttonStyle={styles.saveButton}
               disabledStyle={styles.saveButton}
               titleStyle={styles.createTrackButtonText}
-              onPress={() => saveTrack(val => setLoading(val), offline)}
+              onPress={() => saveTrail()}
               loading={loading}
               disabled={loading}
             /> : null}
           {!recording && locations.length && savedStatus
-            ? <Button
+            ? <View style={{ marginTop: 15 }}><Button
               title='View Trail'
               buttonStyle={styles.updateTrackButton}
               titleStyle={styles.updateTrackButtonText}
               onPress={() => viewTrail()}
-            /> : null}
+            /></View> : null}
         </View>
       </View>
       { trackError ? <View style={styles.error}>
@@ -250,7 +293,6 @@ const paletteStyles = palette => StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     fontSize: 14,
-    marginTop: 15,
   },
   updateTrackButtonText: {
     fontSize: 16,

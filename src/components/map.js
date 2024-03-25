@@ -42,7 +42,7 @@ const Map = () => {
   if (!currentLocation) {
     return <View>
       <Text style={styles.loadingText}>
-        Please make sure your location is turned on in your device settings
+        Please make sure your location is turned on in your device settings.
       </Text>
       <ActivityIndicator size='large' />
     </View>;

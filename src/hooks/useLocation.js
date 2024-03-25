@@ -21,13 +21,11 @@ export default (tracking, callback) => {
       try {
         foregroundStatus = await requestForegroundPermissionsAsync();
         if (foregroundStatus.status === 'granted') {
+          subscriber = await watchPositionAsync({
+            accuracy: Accuracy.BestForNavigation,
+            distanceInterval: 1,
+          }, callback);
           backgroundStatus = await requestBackgroundPermissionsAsync();
-          if (backgroundStatus.status === 'granted') {
-            subscriber = await watchPositionAsync({
-              accuracy: Accuracy.BestForNavigation,
-              distanceInterval: 1,
-            }, callback);
-          }
         }
       } catch (e) {
         if (foregroundStatus.status === 'granted') {
