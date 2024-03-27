@@ -63,7 +63,7 @@ const TrackCreateScreen = ({ route }) => {
 
   const saveTrail = () => {
     fetch().then((state) => {
-      if (state.isConnected || guest === 'yes') {
+      if (state.isConnected || guest === 'yes' || offline) {
         saveTrack(val => setLoading(val), offline);
       } else if (!offline) {
         Alert.alert(

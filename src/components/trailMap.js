@@ -57,7 +57,7 @@ const TrailMap = ({ locations }) => {
           onDeselect={hideCallout}
           tracksViewChanges={false}
           >
-          <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
+          <FontAwesome name="flag-checkered" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }
       { (progress > 0 || play) && locations?.locations[progress]?.coords

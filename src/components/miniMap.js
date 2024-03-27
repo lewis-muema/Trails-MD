@@ -69,7 +69,7 @@ const MiniMap = ({ locations }) => {
           onPress={showCallout}
           onDeselect={hideCallout}
           tracksViewChanges={false}>
-            <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} />
+            <FontAwesome name="flag-checkered" style={styles.flag} color={palette.metricsTop} />
           </Marker>)
       }
     </MapView>

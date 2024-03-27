@@ -91,7 +91,7 @@ const Map = () => {
         { currentLocation.coords.longitude === polyline[polyline.length - 1].coords.longitude
         && currentLocation.coords.latitude === polyline[polyline.length - 1].coords.latitude
           ? <FontAwesome5 name="walking" style={styles.flag} color={palette.text} />
-          : <FontAwesome name="flag" style={styles.flag} color={palette.metricsTop} /> }
+          : <FontAwesome name="flag-checkered" style={styles.flag} color={palette.metricsTop} /> }
       </Marker>)
     }
     <Marker
