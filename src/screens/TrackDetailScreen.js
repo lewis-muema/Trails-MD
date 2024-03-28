@@ -173,21 +173,25 @@ const TrackDetailScreen = ({ route }) => {
                 ? <Loader loading={loading} screen={true} message={ message } centre={true}/>
                 : null }
               <TrailMap locations={trail} mapCenter={mapCenter} />
-              <View style={styles.actionsMenu}>
-                <TouchableOpacity onPress={() => edit()}>
-                  <AntDesign name="edit" style={styles.actionIcons} size={25} color={palette.text} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => confirmDelete()}>
-                  <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.playActions}>
-                <TouchableOpacity onPress={() => setPlay(!play)}>
-                  <View style={styles.playIcon}>
-                    { !play ? <FontAwesome name="play" size={25} color={palette.background} style={{ marginRight: -5 }} />
-                      : <FontAwesome name="pause" size={24} color={palette.background} /> }
+              { !loading || trail.locations
+                ? <View style={styles.actionsMenu}>
+                    <TouchableOpacity onPress={() => edit()}>
+                      <AntDesign name="edit" style={styles.actionIcons} size={25} color={palette.text} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => confirmDelete()}>
+                      <MaterialIcons name="delete" style={styles.actionIcons} size={25} color="red" />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                : null }
+              <View style={styles.playActions}>
+                { !loading || trail.locations
+                  ? <TouchableOpacity onPress={() => setPlay(!play)}>
+                    <View style={styles.playIcon}>
+                      { !play ? <FontAwesome name="play" size={25} color={palette.background} style={{ marginRight: -5 }} />
+                        : <FontAwesome name="pause" size={24} color={palette.background} /> }
+                    </View>
+                  </TouchableOpacity> : null
+                }
                 { progress >= 1 ? <View style={styles.playSlider}>
                   <Slider
                     style={{ width: '100%', height: 40 }}
