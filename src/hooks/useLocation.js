@@ -4,15 +4,20 @@ import {
   requestForegroundPermissionsAsync,
   requestBackgroundPermissionsAsync,
   watchPositionAsync,
+  startLocationUpdatesAsync,
+  stopLocationUpdatesAsync,
 } from 'expo-location';
-import { AppState, Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import * as TaskManager from 'expo-task-manager';
 import { Context as locationContext } from '../context/locationContext';
 
 export default (tracking, callback) => {
   const [err, setErr] = useState(null);
   const { state: { recording } } = useContext(locationContext);
-  let sub = null;
+  TaskManager.defineTask('recording', async ({ data, error }) => {
+    if (data) {
+      callback(data.locations[0]);
+    }
+  });
   useEffect(() => {
     let subscriber;
     let foregroundStatus;
@@ -26,6 +31,20 @@ export default (tracking, callback) => {
             distanceInterval: 1,
           }, callback);
           backgroundStatus = await requestBackgroundPermissionsAsync();
+          if (backgroundStatus.status === 'granted' && recording) {
+            subscriber ? subscriber.remove() : null;
+            await startLocationUpdatesAsync('recording', {
+              accuracy: Accuracy.BestForNavigation,
+              timeInterval: 0,
+              distanceInterval: 1,
+              foregroundService: {
+                notificationTitle: 'Tracking in progress',
+                notificationBody: 'Recording your trail in the background',
+              },
+            });
+          } else {
+            stopWatching();
+          }
         }
       } catch (e) {
         if (foregroundStatus.status === 'granted') {
@@ -41,36 +60,22 @@ export default (tracking, callback) => {
       startWatching();
     } else {
       subscriber ? subscriber.remove() : null;
+      stopWatching();
       subscriber = null;
     }
-
-    sub = AppState.addEventListener('change', handleAppStateChange);
-
     return () => {
       subscriber ? subscriber.remove() : null;
-      sub.remove();
     };
   }, [tracking, callback]);
 
-  const handleAppStateChange = async (newState) => {
-    if (newState === 'background' && recording) {
-      Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-          shouldShowAlert: true,
-          shouldPlaySound: false,
-          shouldSetBadge: false,
-        }),
+  const stopWatching = () => {
+    TaskManager.isTaskRegisteredAsync('recording')
+      .then((tracking) => {
+        if (tracking) {
+          stopLocationUpdatesAsync('recording');
+        }
       });
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          body: 'Trails MD is recording your trail in the background',
-          sticky: true,
-        },
-        trigger: null,
-      });
-    } else {
-      await Notifications.dismissAllNotificationsAsync();
-    }
   };
+
   return [err];
 };
