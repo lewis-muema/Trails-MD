@@ -12,7 +12,7 @@ import { Context as locationContext } from '../context/locationContext';
 
 export default (tracking, callback) => {
   const [err, setErr] = useState(null);
-  const { state: { recording } } = useContext(locationContext);
+  const { state: { recording, permission } } = useContext(locationContext);
   TaskManager.defineTask('recording', async ({ data, error }) => {
     if (data) {
       callback(data.locations[0]);
@@ -56,7 +56,7 @@ export default (tracking, callback) => {
         setErr(e);
       }
     };
-    if (tracking) {
+    if (tracking && permission) {
       startWatching();
     } else {
       subscriber ? subscriber.remove() : null;
@@ -66,7 +66,7 @@ export default (tracking, callback) => {
     return () => {
       subscriber ? subscriber.remove() : null;
     };
-  }, [tracking, callback]);
+  }, [tracking, callback, permission]);
 
   const stopWatching = () => {
     TaskManager.isTaskRegisteredAsync('recording')

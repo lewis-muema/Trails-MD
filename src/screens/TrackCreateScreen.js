@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather, Ionicons, AntDesign } from '@expo/vector-icons';
 import Map from '../components/map';
 import Banner from '../components/banner';
+import InfoCard from '../components/infoCard';
 import { Context as AuthContext } from '../context/AuthContext';
 import { Context as locationContext } from '../context/locationContext';
 import { Context as trackContext } from '../context/trackContext';
@@ -36,9 +37,10 @@ const TrackCreateScreen = ({ route }) => {
     stopRecording,
     changeName,
     reset,
+    setPermission,
   } = useContext(locationContext);
   const { offlineMode } = useContext(AuthContext);
-  const { state: { palette } } = useContext(PaletteContext);
+  const { state: { palette }, showInfoCard } = useContext(PaletteContext);
   const { state: { trail }, setMapCenter, saveTrailsOffline } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
@@ -119,9 +121,14 @@ const TrackCreateScreen = ({ route }) => {
       const val = await AsyncStorage.getItem('offline');
       const modeVal = await AsyncStorage.getItem('mode');
       const guestVal = await AsyncStorage.getItem('guest');
+      const permissions = await AsyncStorage.getItem('permissions');
+      setPermission(permissions);
       setGuest(guestVal);
       setMode(modeVal);
       setOffline(val);
+      if (!permissions) {
+        showInfoCard(true);
+      }
     });
   }, []);
 
@@ -131,6 +138,10 @@ const TrackCreateScreen = ({ route }) => {
     <View style={styles.mapContainer}>
       <Map />
     </View>
+    <InfoCard message={['This app collects location data to enable recording of trails, display the map and stats about your current location such as speed, bearing and coordinates even when the app is closed or not in use.',
+      'In order to do this, the app will request for location permissions',
+      'You can click on the link below to read the privacy policy for more information on this']}
+    title='Use your location' link='https://sites.google.com/view/trailsmd/privacy-policy' type='permission' cta='Grant permissions' image='' />
     <View style={styles.metricsCont}>
       <Spacer></Spacer>
       <Spacer></Spacer>

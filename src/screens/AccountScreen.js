@@ -99,6 +99,7 @@ const AccountScreen = () => {
 
   useEffect(() => {
     navigation.addListener('focus', async () => {
+      showInfoCard(false);
       getData('email');
       useImageColors();
       const value = await AsyncStorage.getItem('offline');
@@ -280,7 +281,7 @@ const AccountScreen = () => {
       'Privacy is a key priority to me and hence I have devoted to make all the processes in this app as secure as possible from using encryption of credentials during login to refreshing tokens on a regular basis.',
       'All the data collected in this app is stored securely and can only be accessed by logged in users. The data can be deleted at any moment using the delete account button. This will delete your account along with all the trails associated with it.',
       'If you find any security vulnerability that has been inadvertently caused by me, or have any question regarding how the app protects your privacy, please send me an email at mdkkcontact@gmail.com']}
-    title='Privacy policy' />
+    title='Privacy policy' type='privacy' cta='Got it!' />
     { error ? <View style={styles.error}>
       <Banner message={error} type='error'></Banner>
       </View> : null

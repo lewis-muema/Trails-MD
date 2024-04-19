@@ -33,6 +33,8 @@ const locationReducer = (state, action) => {
       return { ...state, savedStatus: action.payload };
     case 'set_play':
       return { ...state, play: action.payload };
+    case 'set_permission':
+      return { ...state, permission: action.payload };
     case 'set_progress':
       return { ...state, progress: action.payload };
     case 'reset':
@@ -125,6 +127,10 @@ const setProgress = dispatch => (val) => {
   dispatch({ type: 'set_progress', payload: val });
 };
 
+const setPermission = dispatch => (val) => {
+  dispatch({ type: 'set_permission', payload: val });
+};
+
 const setLocations = dispatch => (name, locations, index) => {
   dispatch({ type: 'set_locations', payload: locations });
   dispatch({ type: 'set_index', payload: index });
@@ -145,6 +151,7 @@ export const { Context, Provider } = createDataContext(
     reset,
     setPlay,
     setProgress,
+    setPermission,
   },
   {
     recording: false,
@@ -158,5 +165,6 @@ export const { Context, Provider } = createDataContext(
     savedStatus: false,
     play: false,
     progress: 0,
+    permission: '',
   },
 );
