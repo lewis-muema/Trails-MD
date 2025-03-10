@@ -32,7 +32,7 @@ const TrackCreateScreen = ({ route }) => {
   const navigation = useNavigation();
   const {
     state: {
-      name, recording, locations, trackStatus, savedStatus,
+      name, recording, locations, trackStatus, savedStatus, backgroundPermission,
     },
     addLocation,
     startRecording,
@@ -40,12 +40,14 @@ const TrackCreateScreen = ({ route }) => {
     changeName,
     reset,
     setPermission,
+    setBackgroundPermissions,
   } = useContext(locationContext);
   const { offlineMode } = useContext(AuthContext);
   const { state: { palette }, showInfoCard } = useContext(PaletteContext);
   const { state: { trail }, setMapCenter, saveTrailsOffline } = useContext(trackContext);
   const [saveTrack, trackError, trackSuccess] = useSaveTrack();
   const [error, setError] = useState('');
+  const [permissionsMessage, setPermissionsMessage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [offline, setOffline] = useState('');
   const [mode, setMode] = useState('');
@@ -123,9 +125,35 @@ const TrackCreateScreen = ({ route }) => {
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,  // or PERMISSIONS.IOS.LOCATION_ALWAYS
       android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     });
+
+    setPermissionsMessage([
+      'This app collects location data to enable recording of trails, display the map and stats about your current location such as speed, bearing and coordinates',
+      'In order to do this, the app will request for location permissions',
+      'You can click on the link below to read the privacy policy for more information on this'
+    ]);
   
     const result = await check(permission);  
     if (result === RESULTS.DENIED || result === RESULTS.BLOCKED) {
+      showInfoCard(true);
+    } else if (result === RESULTS.GRANTED) {
+      checkBackgroundLocationPermission();
+    }
+  };
+
+  const checkBackgroundLocationPermission = async () => {
+    const permission = Platform.select({
+      ios: PERMISSIONS.IOS.LOCATION_ALWAYS,
+      android: PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION,
+    });
+
+    setPermissionsMessage([
+      'In order to do record your trails when your screen is off, the app will request for background location permissions',
+      'You can click on the link below to read the privacy policy for more information on this'
+    ]);
+  
+    const result = await check(permission); 
+    if (result === RESULTS.DENIED || result === RESULTS.BLOCKED) {
+      setBackgroundPermissions('check')
       showInfoCard(true);
     } else if (result === RESULTS.GRANTED) {
       showInfoCard(false);
@@ -144,15 +172,19 @@ const TrackCreateScreen = ({ route }) => {
     });
   }, []);
 
+  useEffect(() => {
+    if (backgroundPermission === "checkBg") {
+      checkBackgroundLocationPermission()
+    }
+  }, [backgroundPermission])
+
   const styles = paletteStyles(palette);
 
   return <View style={styles.outerContainer}>
     <View style={styles.mapContainer}>
       <Map />
     </View>
-    <InfoCard message={['This app collects location data to enable recording of trails, display the map and stats about your current location such as speed, bearing and coordinates even when the app is closed or not in use.',
-      'In order to do this, the app will request for location permissions',
-      'You can click on the link below to read the privacy policy for more information on this']}
+    <InfoCard message={permissionsMessage}
     title='Use your location' link='https://sites.google.com/view/trailsmd/privacy-policy' type='permission' cta='Grant permissions' image='' />
     <View style={styles.metricsCont}>
       <Spacer></Spacer>

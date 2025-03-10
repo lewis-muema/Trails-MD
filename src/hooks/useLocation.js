@@ -14,7 +14,7 @@ import { Context as locationContext } from '../context/locationContext';
 
 export default (tracking, callback) => {
   const [err, setErr] = useState(null);
-  const { state: { recording, permission } } = useContext(locationContext);
+  const { state: { recording, permission, backgroundPermission }, setBackgroundPermissions } = useContext(locationContext);
   TaskManager.defineTask('recording', async ({ data, error }) => {
     if (data) {
       callback(data.locations[0]);
@@ -23,7 +23,6 @@ export default (tracking, callback) => {
   useEffect(() => {
     let subscriber;
     let foregroundStatus;
-    let backgroundStatus;
     const startWatching = async () => {
       try {
         foregroundStatus = await requestForegroundPermissionsAsync();
@@ -32,21 +31,7 @@ export default (tracking, callback) => {
             accuracy: Accuracy.BestForNavigation,
             distanceInterval: 1,
           }, callback);
-          backgroundStatus = await requestBackgroundPermissionsAsync();
-          if (backgroundStatus.status === 'granted' && recording) {
-            subscriber ? subscriber.remove() : null;
-            await startLocationUpdatesAsync('recording', {
-              accuracy: Accuracy.BestForNavigation,
-              timeInterval: 0,
-              distanceInterval: 1,
-              foregroundService: {
-                notificationTitle: 'Tracking in progress',
-                notificationBody: 'Recording your trail in the background',
-              },
-            });
-          } else {
-            stopWatching();
-          }
+          setBackgroundPermissions('checkBg')
         } else if (!foregroundStatus.canAskAgain) {
           showPermissionAlert();
         }
@@ -72,6 +57,12 @@ export default (tracking, callback) => {
     };
   }, [tracking, callback, permission]);
 
+  useEffect(() => {
+    if (backgroundPermission === 'denied') {
+      requestBackgroundPermissions();
+    }
+  }, [backgroundPermission])
+
   const stopWatching = () => {
     TaskManager.isTaskRegisteredAsync('recording')
       .then((tracking) => {
@@ -80,6 +71,27 @@ export default (tracking, callback) => {
         }
       });
   };
+
+  const requestBackgroundPermissions = async () => {
+    let backgroundStatus;
+    backgroundStatus = await requestBackgroundPermissionsAsync();
+    if (backgroundStatus.status === 'granted' && recording) {
+      subscriber ? subscriber.remove() : null;
+      await startLocationUpdatesAsync('recording', {
+        accuracy: Accuracy.BestForNavigation,
+        timeInterval: 0,
+        distanceInterval: 1,
+        foregroundService: {
+          notificationTitle: 'Tracking in progress',
+          notificationBody: 'Recording your trail in the background',
+        },
+      });
+    } else if (!backgroundStatus.canAskAgain) {
+      showPermissionAlert();
+    } else {
+      stopWatching();
+    }
+  }
 
   const showPermissionAlert = () => {
     Alert.alert(

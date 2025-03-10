@@ -11,7 +11,7 @@ const InfoCard = ({
   message, title, link, type, cta,
 }) => {
   const { state: { palette, infoCard }, showInfoCard } = useContext(PaletteContext);
-  const { state: { permission }, setPermission } = useContext(locationContext);
+  const { state: { permission, backgroundPermission }, setPermission, setBackgroundPermissions } = useContext(locationContext);
 
   const styles = paletteStyles(palette, infoCard, type);
 
@@ -23,8 +23,12 @@ const InfoCard = ({
   };
 
   const close = async () => {
-    setPermission('accept');
-    await AsyncStorage.setItem('permissions', 'accept');
+    if (backgroundPermission === 'check') {
+      setBackgroundPermissions('denied')
+    } else {
+      setPermission('accept');
+      await AsyncStorage.setItem('permissions', 'accept');
+    }
     showInfoCard(false);
   };
 
