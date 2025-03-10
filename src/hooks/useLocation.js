@@ -7,6 +7,8 @@ import {
   startLocationUpdatesAsync,
   stopLocationUpdatesAsync,
 } from 'expo-location';
+import { Alert } from 'react-native';
+import { Linking } from 'react-native';
 import * as TaskManager from 'expo-task-manager';
 import { Context as locationContext } from '../context/locationContext';
 
@@ -45,6 +47,8 @@ export default (tracking, callback) => {
           } else {
             stopWatching();
           }
+        } else if (!foregroundStatus.canAskAgain) {
+          showPermissionAlert();
         }
       } catch (e) {
         if (foregroundStatus.status === 'granted') {
@@ -75,6 +79,17 @@ export default (tracking, callback) => {
           stopLocationUpdatesAsync('recording');
         }
       });
+  };
+
+  const showPermissionAlert = () => {
+    Alert.alert(
+      "Location Permission Required",
+      "You have permanently denied location access. Please enable it in settings.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Open Settings", onPress: () => Linking.openSettings() },
+      ]
+    );
   };
 
   return [err];

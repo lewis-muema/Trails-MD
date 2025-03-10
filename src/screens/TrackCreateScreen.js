@@ -6,6 +6,8 @@ import {
   ScrollView, KeyboardAvoidingView, Keyboard,
 } from 'react-native';
 import { fetch } from '@react-native-community/netinfo';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { Platform } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import { useIsFocused, useNavigation, CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -116,19 +118,29 @@ const TrackCreateScreen = ({ route }) => {
     reset();
   };
 
+  const checkLocationPermission = async () => {
+    const permission = Platform.select({
+      ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,  // or PERMISSIONS.IOS.LOCATION_ALWAYS
+      android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+    });
+  
+    const result = await check(permission);  
+    if (result === RESULTS.DENIED || result === RESULTS.BLOCKED) {
+      showInfoCard(true);
+    } else if (result === RESULTS.GRANTED) {
+      showInfoCard(false);
+    }
+  };
+
   useEffect(() => {
     navigation.addListener('focus', async () => {
       const val = await AsyncStorage.getItem('offline');
       const modeVal = await AsyncStorage.getItem('mode');
       const guestVal = await AsyncStorage.getItem('guest');
-      const permissions = await AsyncStorage.getItem('permissions');
-      setPermission(permissions);
+      checkLocationPermission();
       setGuest(guestVal);
       setMode(modeVal);
       setOffline(val);
-      if (!permissions) {
-        showInfoCard(true);
-      }
     });
   }, []);
 
